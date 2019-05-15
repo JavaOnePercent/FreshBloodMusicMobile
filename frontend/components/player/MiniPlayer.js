@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { Provider, connect } from 'react-redux';
 import Icon from "react-native-vector-icons/Ionicons";
 import { PlayerAction } from "../../redux/actions/player";
-// import store from "../../../redux/store";
+import store from "../../redux/store";
 
 class MiniPlayer extends Component {
     constructor(props) {
@@ -46,57 +46,59 @@ class MiniPlayer extends Component {
 
         const { iconAlbum, namePerformer, nameTrack, openPlayer } = this.props;
         return (
-            <View style={styles.container}>
-                <View style={styles.background}>
-                </View>
-                <TouchableHighlight onPress={openPlayer} underlayColor="#fff">
-                    <View style={styles.playerContainer}>
-                        <View style={styles.rowStyle}>
-                            <View style={styles.iconAlbum}>
-                                <Image
-                                    source={{uri: iconAlbum}}
-                                    style={{width: 50, height: 50, borderRadius: 3}}
-                                />
-                            </View>
+                <Provider store={store}>
+                    <View style={styles.container}>
+                        <View style={styles.background}>
                         </View>
-                        <View style={styles.rowStyle}>
-                            <View style={styles.nameTrack}>
-                                <Text style={styles.title}>{nameTrack}</Text>
-                            </View>
-                        </View>
-                        <View style={styles.rowStyle}>
-                            <View style={styles.play}>
-                                {this.props.isPlay === false &&
-                                    <TouchableHighlight style={styles.button} onPress={this.play} underlayColor="#fff">
-                                        <Icon name="ios-play"
-                                              size={30}
-                                              color={'#000'}
+                        <TouchableHighlight onPress={openPlayer} underlayColor="#fff">
+                            <View style={styles.playerContainer}>
+                                <View style={styles.rowStyle}>
+                                    <View style={styles.iconAlbum}>
+                                        <Image
+                                            source={{uri: iconAlbum}}
+                                            style={{width: 50, height: 50, borderRadius: 3}}
                                         />
-                                    </TouchableHighlight>
-                                }
-                                {this.props.isPlay === true &&
-                                    <TouchableHighlight style={styles.button} onPress={this.pause} underlayColor="#fff">
-                                        <Icon name="ios-pause"
-                                              size={30}
-                                              color={'#000'}
-                                        />
-                                    </TouchableHighlight>
-                                }
+                                    </View>
+                                </View>
+                                <View style={styles.rowStyle}>
+                                    <View style={styles.nameTrack}>
+                                        <Text style={styles.title}>{nameTrack}</Text>
+                                    </View>
+                                </View>
+                                <View style={styles.rowStyle}>
+                                    <View style={styles.play}>
+                                        {this.props.isPlay === false &&
+                                            <TouchableHighlight style={styles.button} onPress={this.play} underlayColor="#fff">
+                                                <Icon name="ios-play"
+                                                      size={30}
+                                                      color={'#000'}
+                                                />
+                                            </TouchableHighlight>
+                                        }
+                                        {this.props.isPlay === true &&
+                                            <TouchableHighlight style={styles.button} onPress={this.pause} underlayColor="#fff">
+                                                <Icon name="ios-pause"
+                                                      size={30}
+                                                      color={'#000'}
+                                                />
+                                            </TouchableHighlight>
+                                        }
+                                    </View>
+                                </View>
+                                <View style={styles.rowStyle}>
+                                    <View style={styles.next}>
+                                        <TouchableHighlight style={styles.button} onPress={this.play} underlayColor="#fff">
+                                            <Icon name="ios-fastforward"
+                                                  size={30}
+                                                  color={'#000'}
+                                            />
+                                        </TouchableHighlight>
+                                    </View>
+                                </View>
                             </View>
-                        </View>
-                        <View style={styles.rowStyle}>
-                            <View style={styles.next}>
-                                <TouchableHighlight style={styles.button} onPress={this.play} underlayColor="#fff">
-                                    <Icon name="ios-fastforward"
-                                          size={30}
-                                          color={'#000'}
-                                    />
-                                </TouchableHighlight>
-                            </View>
-                        </View>
+                        </TouchableHighlight>
                     </View>
-                </TouchableHighlight>
-            </View>
+                </Provider>
         )
     }
 }
@@ -177,8 +179,8 @@ export default MiniPlayer;
 //     isPlay: state.player
 // })
 // export default connect((mapStateToProps), {
-//     onPressPlayButton: PlayerAction.pressPlayButton,
-//     onPressPauseButton: PlayerAction.pressPauseButton
+//     onPressPlayButton: PlayerAction.playPlayer,
+//     onPressPauseButton: PlayerAction.pausePlayer
 // })(MiniPlayer)
 //
 // export default connect()(MiniPlayer)

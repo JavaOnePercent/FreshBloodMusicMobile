@@ -13,12 +13,24 @@ import {
 import {Icon, Image, ListItem} from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { Provider, connect } from 'react-redux';
-import {clearEdition} from "../redux/actions/news";
 import store from "../redux/store";
+import {addEditionQueue, addTrackQueue} from "../redux/actions/player";
 
 class Playlist extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            isTrack: false,
+            idTrack: -1,
+            titleTrack: '',
+            audioTrack: '',
+            durationTrack: 0,
+            isLikedTrack: false
+
+        }
+
+        this.back = this.back.bind(this)
+        this.addPlaylist = this.addPlaylist.bind(this)
     }
 
     static propTypes = {
@@ -37,13 +49,6 @@ class Playlist extends Component {
         tracks: []
     }
 
-    componentDidMount()
-    {
-        if(this.interval){
-            clearInterval(this.interval);
-        }
-    }
-
     static getDerivedStateFromProps(nextProps, prevState) {
 
         if(prevState.tracks !== nextProps.tracks)
@@ -52,8 +57,55 @@ class Playlist extends Component {
                 tracks: nextProps.tracks
             }
         }
-
     }
+
+    onPressLong(l)
+    {
+        this.setState({
+            isTrack: true,
+            idTrack: l.id,
+            titleTrack: l.name_trc,
+            audioTrack: l.audio_trc,
+            durationTrack: l.duration,
+            isLikedTrack: l.is_liked
+
+        });
+    }
+
+    addPlaylist()
+    {
+        if(this.state.isTrack)
+        {
+            this.props.onAddTrackQueue({id: this.state.idTrack, performer: this.props.namePerformer, cover: this.props.iconAlbum,
+                title: this.state.titleTrack, audio: this.state.audioTrack, duration: this.state.durationTrack,
+                isLiked: this.state.isLikedTrack})
+        }
+        else
+        {
+            let edition = []
+            this.props.edition.map((l, i) => (
+                edition.push({id: l.id, performer: this.props.namePerformer, cover: this.props.iconAlbum,
+                    title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                    isLiked: l.is_liked})
+            ))
+            this.props.onAddEditionQueue(edition)
+        }
+    }
+
+    back()
+    {
+        this.setState({
+            isTrack: false,
+            idTrack: -1,
+            titleTrack: '',
+            audioTrack: '',
+            durationTrack: 0,
+            isLikedTrack: false
+
+        });
+    }
+
+
 
     render() {
 
@@ -65,7 +117,7 @@ class Playlist extends Component {
                     <View style={styles.background}>
                         <Image
                             source={{uri: iconAlbum}}
-                            style={{opacity: 0.7, height: 135, width: 300, resizeMode: 'cover'}}
+                            style={{opacity: 0.6, height: 135, width: 300, resizeMode: 'cover'}}
                             blurRadius={3}
                         />
                     </View>
@@ -87,14 +139,49 @@ class Playlist extends Component {
                                 />
                             </View>
                             <View style={styles.rowStyle}>
-                                <View style={styles.columnStyle}>
-                                    <Text style={styles.titleTrack}>{nameAlbum}</Text>
-                                    <Text style={styles.titlePerformer}>{namePerformer}</Text>
-                                    <Text style={styles.titlePerformer}>{style  + ' (' + year + ')'}</Text>
-                                </View>
+                                {
+                                    this.state.isTrack === false &&
+                                    <View style={styles.columnStyle}>
+                                        <Text style={styles.titleTrack}>{nameAlbum}</Text>
+                                        <Text style={styles.titlePerformer}>{namePerformer}</Text>
+                                        <Text style={styles.titlePerformer}>{style + ' (' + year + ')'}</Text>
+                                    </View>
+                                }
+                                {
+                                    this.state.isTrack === true &&
+                                    <View style={styles.columnStyle}>
+                                        <Text style={styles.titleTrack}>{this.state.titleTrack}</Text>
+                                        <Text style={styles.titlePerformer}>{namePerformer}</Text>
+                                        <Text style={styles.titlePerformer}>{nameAlbum}</Text>
+                                    </View>
+                                }
                             </View>
                         </View>
                         <View style={styles.buttonPanel}>
+                            {
+                                this.state.isTrack === false &&
+                                <View style={styles.buttonRowStyle}>
+                                    <TouchableHighlight style={styles.button} underlayColor="#fff" >
+                                        <Icon name="random"
+                                              type="font-awesome"
+                                              size={22}
+                                              color={'#000'}
+                                        />
+                                    </TouchableHighlight>
+                                </View>
+                            }
+                            {
+                                this.state.isTrack === true &&
+                                <View style={styles.buttonRowStyle}>
+                                    <TouchableHighlight style={styles.button} onPress={this.back} underlayColor="#fff" >
+                                        <Icon name="md-arrow-back"
+                                              type="ionicon"
+                                              size={24}
+                                              color={'#000'}
+                                        />
+                                    </TouchableHighlight>
+                                </View>
+                            }
                             <View style={styles.buttonRowStyle}>
                                 <TouchableHighlight style={styles.button} underlayColor="#fff" >
                                     <Icon name="ios-play"
@@ -106,15 +193,15 @@ class Playlist extends Component {
                             </View>
                             <View style={styles.buttonRowStyle}>
                                 <TouchableHighlight style={styles.button} underlayColor="#fff" >
-                                    <Icon name="random"
-                                          type="font-awesome"
-                                          size={22}
+                                    <Icon name="ios-heart-empty"
+                                          type="ionicon"
+                                          size={26}
                                           color={'#000'}
                                     />
                                 </TouchableHighlight>
                             </View>
                             <View style={styles.buttonRowStyle}>
-                                <TouchableHighlight style={styles.button} underlayColor="#fff" >
+                                <TouchableHighlight style={styles.button} onPress={this.addPlaylist} underlayColor="#fff" >
                                     <Icon name="playlist-plus"
                                           type="material-community"
                                           size={30}
@@ -124,33 +211,98 @@ class Playlist extends Component {
                             </View>
                         </View>
                         <ScrollView showsVerticalScrollIndicator={false}>
-                            {/*<View style={{height: 160}}>*/}
-                                {
-                                    this.props.tracks.length !== 0 &&
-                                    this.props.tracks.map((l, i) => (
-                                        <TouchableHighlight onPress={() => {ToastAndroid.show(l.audio_trc, ToastAndroid.SHORT)}} style={{height: 40, justifyContent: 'center'}} underlayColor="#fff">
+                            {
+                                this.state.isTrack === false &&
+                                this.props.tracks.length !== 0 &&
+                                this.props.tracks.map((l, i) => (
+                                    <TouchableHighlight onPress={() => {ToastAndroid.show(l.audio_trc, ToastAndroid.SHORT)}} onLongPress={this.onPressLong.bind(this, l)} style={{height: 40, justifyContent: 'center'}} underlayColor="#fff">
+                                        <View style={styles.listTrack}>
+                                            <View style={styles.rowIconOrNumberStyle}>
+                                                <Text style={styles.textNumber}>{l.id}</Text>
+                                            </View>
+                                            <View style={styles.rowStyle}>
+                                                <Text style={styles.textName}>{l.name_trc}</Text>
+                                            </View>
+                                        </View>
+                                    </TouchableHighlight>
+                                ))
+                            }
+                            {
+                                this.state.isTrack === false &&
+                                this.props.tracks.length === 0 &&
+                                <View style={styles.indicator}>
+                                    <ActivityIndicator color={'#8d6fb9'}/>
+                                </View>
+                            }
+                            {
+                                this.state.isTrack === true &&
+                                    <View>
+                                        <TouchableHighlight onPress={() => {ToastAndroid.show(this.state.titleTrack, ToastAndroid.SHORT)}} underlayColor="#fff">
                                             <View style={styles.listTrack}>
-                                                <View style={styles.rowStyle}>
-                                                    <Text style={styles.textNumber}>{l.id}</Text>
+                                                <View style={styles.rowPlaylistStyle}>
+                                                    <Text style={styles.textName}>Разное</Text>
                                                 </View>
-                                                <View style={styles.rowStyle}>
-                                                    <Text style={styles.textName}>{l.name_trc}</Text>
+                                                <View style={styles.rowIconOrNumberStyle}>
+                                                    <Icon name="ios-add"
+                                                          type="ionicon"
+                                                          size={30}
+                                                          color={'#000'}
+                                                    />
                                                 </View>
                                             </View>
                                         </TouchableHighlight>
-                                    ))
-                                }
-                                {
-                                    this.props.tracks.length === 0 &&
-                                    <View style={styles.indicator}>
-                                        <ActivityIndicator color={'#8d6fb9'}/>
+                                        <TouchableHighlight onPress={() => {ToastAndroid.show(this.state.titleTrack, ToastAndroid.SHORT)}} underlayColor="#fff">
+                                            <View style={styles.listTrack}>
+                                                <View style={styles.rowPlaylistStyle}>
+                                                    <Text style={styles.textName}>Плейлист Я - Вова</Text>
+                                                </View>
+                                                <View style={styles.rowIconOrNumberStyle}>
+                                                    <Icon name="ios-checkmark"
+                                                          type="ionicon"
+                                                          size={36}
+                                                          color={'#000'}
+                                                    />
+                                                </View>
+                                            </View>
+                                        </TouchableHighlight>
+                                        <TouchableHighlight onPress={() => {ToastAndroid.show(this.state.titleTrack, ToastAndroid.SHORT)}} underlayColor="#fff">
+                                            <View style={styles.listTrack}>
+                                                <View style={styles.rowPlaylistStyle}>
+                                                    <Text style={styles.textName}>Говной воняет</Text>
+                                                </View>
+                                                <View style={styles.rowIconOrNumberStyle}>
+                                                    <Icon name="ios-add"
+                                                          type="ionicon"
+                                                          size={30}
+                                                          color={'#000'}
+                                                    />
+                                                </View>
+                                            </View>
+                                        </TouchableHighlight>
+                                        <TouchableHighlight onPress={() => {ToastAndroid.show(this.state.titleTrack, ToastAndroid.SHORT)}} underlayColor="#fff">
+                                            <View style={styles.listTrack}>
+                                                <View style={styles.rowPlaylistStyle}>
+                                                    <Text style={styles.textName}>Плейлист Илюхи</Text>
+                                                </View>
+                                                <View style={styles.rowIconOrNumberStyle}>
+                                                    <Icon name="ios-add"
+                                                          type="ionicon"
+                                                          size={30}
+                                                          color={'#000'}
+                                                    />
+                                                </View>
+                                            </View>
+                                        </TouchableHighlight>
                                     </View>
-                                }
 
-                            {/*</View>*/}
+
+                            }
                         </ScrollView>
-                        <View style={{marginBottom: 5}}>
-                            <Text style={styles.text}>{listens + ' прослушиваний'}</Text>
+                        <View style={{marginBottom: 5, height: 40, justifyContent: 'center'}}>
+                            {
+                                this.state.isTrack === true &&
+                                <Text style={styles.text}>{listens + ' прослушиваний'}</Text>
+                            }
                             <Text style={styles.text}>{likes + ' пользователям понравилось'}</Text>
                         </View>
                     </View>
@@ -203,6 +355,7 @@ const styles = StyleSheet.create({
         paddingLeft: 20,
         flexWrap: 'wrap',
         flexDirection: 'row'
+
     },
     buttonPanel: {
         marginTop: 15,
@@ -214,16 +367,35 @@ const styles = StyleSheet.create({
     },
     listTrack: {
         flexWrap: 'wrap',
-        flexDirection: 'row'
+        flexDirection: 'row',
+        height: 40,
+        marginLeft: 20
+
     },
     rowStyle: {
         flexDirection: 'row',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    rowIconOrNumberStyle: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 30
+    },
+    rowPlaylistStyle: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        width: 220
     },
     buttonRowStyle: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        marginHorizontal: 20
+        marginHorizontal: 10
     },
     columnStyle: {
         flexDirection: 'column',
@@ -237,12 +409,11 @@ const styles = StyleSheet.create({
     },
     titlePerformer: {
         fontSize: 15,
-        color: 'grey'
+        color: '#000'
     },
     textNumber: {
         fontSize: 16,
-        color: 'grey',
-        marginLeft: 20
+        color: 'grey'
     },
     textName: {
         fontSize: 16,
@@ -259,4 +430,14 @@ const styles = StyleSheet.create({
     }
 });
 
-export default connect()(Playlist)
+export default connect(
+    state => ({edition: state.edition}),
+    dispatch => ({
+        onAddTrackQueue: (track) => {
+            dispatch(addTrackQueue(track));
+        },
+        onAddEditionQueue: (edition) => {
+            dispatch(addEditionQueue(edition));
+        }
+    })
+)(Playlist)

@@ -8,7 +8,7 @@ import MiniPlayer from "../../components/player/MiniPlayer";
 import FullPlayer from "../../components/player/FullPlayer";
 
 import Sound from 'react-native-sound';
-import {pressPlayButton, pressPauseButton} from "../../redux/actions/player";
+import {playPlayer, pausePlayer} from "../../redux/actions/player";
 import PropTypes from "prop-types";
 import {ADDRESS_SERVER} from "../../components/constants/constants";
 
@@ -111,7 +111,8 @@ class AppMusic extends React.Component {
                                 pauseTrack={this.pause}
                                 sound={this.sound}
                                 closePlayer={this.close}
-                                isPlay={this.props.isPlay}/>
+                                isPlay={this.props.isPlay}
+                                playlist={this.props.queue}/>
                             {/*</ScrollView>*/}
                         </View>
                     }
@@ -138,13 +139,13 @@ const styles = StyleSheet.create({
 });
 
 export default connect(
-    state => ({isPlay: state.player}),
+    state => ({isPlay: state.player, queue: state.queue}),
     dispatch => ({
         onPressPlayButton: () => {
-            dispatch(pressPlayButton());
+            dispatch(playPlayer());
         },
         onPressPauseButton: () => {
-            dispatch(pressPauseButton());
+            dispatch(pausePlayer());
         }
     })
 )(AppMusic)

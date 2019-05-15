@@ -7,76 +7,9 @@ import { Icon } from 'react-native-elements';
 import SystemSetting from 'react-native-system-setting';
 import SortableList from 'react-native-sortable-list';
 import Swiper from "react-native-swiper";
-import { MenuProvider, Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
-// import store from "../../../redux/store";
+import store from "../../redux/store";
 
 import Track from '../Track';
-import {ADDRESS_SERVER} from "../constants/constants";
-
-
-const data = {
-    0: {
-        image: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-        namePerformer: 'twenty one pilots',
-        nameTrack: 'Ride',
-    },
-    1: {
-        image: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-        namePerformer: 'twenty one pilots',
-        nameTrack: 'Fairly Local',
-    },
-    2: {
-        image: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-        namePerformer: 'twenty one pilots',
-        nameTrack: 'Tear In My Heart',
-    },
-    3: {
-        image: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-        namePerformer: 'twenty one pilots',
-        nameTrack: 'Lane Boy',
-    },
-    4: {
-        image: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-        namePerformer: 'twenty one pilots',
-        nameTrack: 'The Judge',
-    },
-    5: {
-        image: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-        namePerformer: 'twenty one pilots',
-        nameTrack: 'Doubt',
-    },
-    6: {
-        image: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-        namePerformer: 'twenty one pilots',
-        nameTrack: 'Polarize',
-    },
-    7: {
-        image: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-        namePerformer: 'twenty one pilots',
-        nameTrack: 'We Don`t Believe What`s On TV',
-    },
-    8: {
-        image: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-        namePerformer: 'twenty one pilots',
-        nameTrack: 'Message Man',
-    },
-    9: {
-        image: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-        namePerformer: 'twenty one pilots',
-        nameTrack: 'Hometown',
-    },
-    10: {
-        image: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-        namePerformer: 'twenty one pilots',
-        nameTrack: 'Not Today',
-    },
-    11: {
-        image: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-        namePerformer: 'twenty one pilots',
-        nameTrack: 'Goner',
-    },
-};
-
 
 
 class FullPlayer extends Component {
@@ -109,7 +42,8 @@ class FullPlayer extends Component {
         pauseTrack: PropTypes.func.isRequired,
         sound: PropTypes.object.isRequired,
         closePlayer: PropTypes.func.isRequired,
-        isPlay: PropTypes.bool.isRequired
+        isPlay: PropTypes.bool.isRequired,
+        playlist: PropTypes.array.isRequired
     }
 
     componentDidMount()
@@ -278,217 +212,222 @@ class FullPlayer extends Component {
         const currentTimeString = FullPlayer.getAudioTimeString(this.state.playSeconds);
         const durationString = FullPlayer.getAudioTimeString(this.state.showDuration);
 
-        const { iconAlbum, namePerformer, nameTrack, closePlayer } = this.props;
+        const { iconAlbum, namePerformer, nameTrack, closePlayer, playlist } = this.props;
         return (
-            <View style={styles.container}>
-                <TouchableHighlight onPress={closePlayer} style={{alignItems: 'center', width: Dimensions.get('window').width, height: 50, backgroundColor: '#f6f6f6'}} underlayColor="#f6f6f6">
-                    <Image
-                        source={require('../../icons/arrow-down-grey.png')}
-                        style={{marginTop: 15, width: 35, height: 10}}
-                    />
-                </TouchableHighlight>
-                <Swiper style={styles.wrapper} horizontal={true} loop={false}
-                        dot={<View style={{backgroundColor: '#8d8e93', width: 10, height: 10, borderRadius: 5, marginLeft: 5, marginRight: 5, marginBottom: 20}} />}
-                        activeDot={<View style={{backgroundColor: '#8d6fb9', width: 10, height: 10, borderRadius: 5, marginLeft: 5, marginRight: 5, marginBottom: 20}} />}>
-                    <View style={styles.slide1}>
-                        <View style={styles.bigPlayer}>
-                            <View style={styles.imageAlbum}>
-                                <Image
-                                    source={{uri: iconAlbum}}
-                                    style={{width: 250, height: 250, borderRadius: 7}}
-                                />
-                            </View>
-                            <Slider
-                                onTouchStart={this.onSliderTrackStart}
-                                onTouchEnd={this.onSliderTrackEnd}
-                                onValueChange={this.onSliderTrackEditing}
-                                value={this.state.playSeconds} maximumValue={this.state.duration} maximumTrackTintColor='#8d8e93' minimumTrackTintColor='#8d6fb9' thumbTintColor='#8d6fb9'
-                                style={{ width: Dimensions.get('window').width - 80, alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
-                            <View style={{flexDirection:'row'}}>
-                                <Text style={{color:'#8d8e93', marginRight: Dimensions.get('window').width / 2 - 81}}>{currentTimeString}</Text>
-                                <Text style={{color:'#8d8e93', marginLeft: Dimensions.get('window').width / 2 - 83}}>-{durationString}</Text>
-                            </View>
-                            <Text style={styles.nameTrack}>{nameTrack}</Text>
-                            <Text style={styles.namePerformer}>{namePerformer}</Text>
-                            <View style={styles.buttonContainer}>
-                                <View style={styles.rowStyle}>
-                                    <View style={styles.play}>
-                                        {this.state.isLike === false &&
-                                        <TouchableHighlight style={styles.button} onPress={this.onLike} underlayColor="#fff">
-                                            <Icon name="ios-heart-empty" type="ionicon" size={28} color={'#000'}
-                                            />
-                                        </TouchableHighlight>
-                                        }
-
-                                        {this.state.isLike === true &&
-                                        <TouchableHighlight style={styles.button} onPress={this.onLike} underlayColor="#fff">
-                                            <Icon name="ios-heart"
-                                                  type="ionicon"
-                                                  size={28}
-                                                  color={'#8d6fb9'}
-                                            />
-                                        </TouchableHighlight>
-                                        }
-                                    </View>
+            <Provider store={store}>
+                <View style={styles.container}>
+                    <TouchableHighlight onPress={closePlayer} style={{alignItems: 'center', width: Dimensions.get('window').width, height: 50, backgroundColor: '#f6f6f6'}} underlayColor="#f6f6f6">
+                        <Image
+                            source={require('../../icons/arrow-down-grey.png')}
+                            style={{marginTop: 15, width: 35, height: 10}}
+                        />
+                    </TouchableHighlight>
+                    <Swiper style={styles.wrapper} horizontal={true} loop={false}
+                            dot={<View style={{backgroundColor: '#8d8e93', width: 8, height: 8, borderRadius: 4, marginLeft: 4, marginRight: 4, marginBottom: 20}} />}
+                            activeDot={<View style={{backgroundColor: '#8d6fb9', width: 8, height: 8, borderRadius: 4, marginLeft: 4, marginRight: 4, marginBottom: 20}} />}>
+                        <View style={styles.slide1}>
+                            <View style={styles.bigPlayer}>
+                                <View style={styles.imageAlbum}>
+                                    <Image
+                                        source={{uri: iconAlbum}}
+                                        style={{width: 250, height: 250, borderRadius: 7}}
+                                    />
                                 </View>
-
-                                <View style={styles.rowStyle}>
-                                    <View style={styles.play}>
-                                        <TouchableHighlight style={styles.button} underlayColor="#fff">
-                                            <Icon name="ios-rewind"
-                                                  type="ionicon"
-                                                  size={36}
-                                                  color={'#000'}
-                                            />
-                                        </TouchableHighlight>
-                                    </View>
-                                </View>
-                                <View style={styles.rowStyle}>
-                                    <View style={styles.play}>
-                                        {this.props.isPlay === false &&
-                                        <TouchableHighlight style={styles.button} onPress={this.play} underlayColor="#fff">
-                                            <Icon name="ios-play"
-                                                  type="ionicon"
-                                                  size={48}
-                                                  color={'#000'}
-                                            />
-                                        </TouchableHighlight>
-                                        }
-                                        {this.props.isPlay === true &&
-                                        <TouchableHighlight style={styles.button} onPress={this.pause} underlayColor="#fff">
-                                            <Icon name="ios-pause"
-                                                  type="ionicon"
-                                                  size={48}
-                                                  color={'#000'}
-                                            />
-                                        </TouchableHighlight>
-                                        }
-                                    </View>
-                                </View>
-                                <View style={styles.rowStyle}>
-                                    <View style={styles.play}>
-                                        <TouchableHighlight style={styles.button} underlayColor="#fff">
-                                            <Icon name="ios-fastforward"
-                                                  type="ionicon"
-                                                  size={36}
-                                                  color={'#000'}
-                                            />
-                                        </TouchableHighlight>
-                                    </View>
-                                </View>
-                                <View style={styles.rowStyle}>
-                                    <View style={styles.play}>
-                                        <TouchableHighlight style={styles.button} underlayColor="#fff">
-                                            <Icon name="ios-more"
-                                                  type="ionicon"
-                                                  size={28}
-                                                  color={'#000'}
-                                            />
-                                        </TouchableHighlight>
-                                    </View>
-                                </View>
-                            </View>
-                            <View style={{marginVertical:15, marginHorizontal:15, flexDirection:'row'}}>
-                                <Icon name="ios-volume-mute"
-                                      type="ionicon"
-                                      size={20}
-                                      color={'#8d8e93'}
-                                />
                                 <Slider
-                                    onTouchStart={this.onSliderVolumeStart}
-                                    onTouchEnd={this.onSliderVolumeEnd}
-                                    onValueChange={this.onSliderVolumeEditing}
-                                    value={this.state.volume} maximumValue={1.0} maximumTrackTintColor='#8d8e93' minimumTrackTintColor='#8d6fb9' thumbTintColor='#8d6fb9'
-                                    style={{width: Dimensions.get('window').width - 120, alignSelf:'center', marginHorizontal: Platform.select({ios:5})}}
-                                    ref={(sliderVol) => this.sliderVol = sliderVol}/>
-                                <Icon name="ios-volume-high"
-                                      type="ionicon"
-                                      size={20}
-                                      color={'#8d8e93'}
-                                />
+                                    onTouchStart={this.onSliderTrackStart}
+                                    onTouchEnd={this.onSliderTrackEnd}
+                                    onValueChange={this.onSliderTrackEditing}
+                                    value={this.state.playSeconds} maximumValue={this.state.duration} maximumTrackTintColor='#8d8e93' minimumTrackTintColor='#8d6fb9' thumbTintColor='#8d6fb9'
+                                    style={{ width: Dimensions.get('window').width - 80, alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
+                                <View style={{flexDirection:'row'}}>
+                                    <Text style={{color:'#8d8e93', marginRight: Dimensions.get('window').width / 2 - 81}}>{currentTimeString}</Text>
+                                    <Text style={{color:'#8d8e93', marginLeft: Dimensions.get('window').width / 2 - 83}}>-{durationString}</Text>
+                                </View>
+                                <Text style={styles.nameTrack}>{nameTrack}</Text>
+                                <Text style={styles.namePerformer}>{namePerformer}</Text>
+                                <View style={styles.buttonContainer}>
+                                    <View style={styles.rowStyle}>
+                                        <View style={styles.play}>
+                                            {this.state.isLike === false &&
+                                            <TouchableHighlight style={styles.button} onPress={this.onLike} underlayColor="#fff">
+                                                <Icon name="ios-heart-empty" type="ionicon" size={28} color={'#000'}
+                                                />
+                                            </TouchableHighlight>
+                                            }
+
+                                            {this.state.isLike === true &&
+                                            <TouchableHighlight style={styles.button} onPress={this.onLike} underlayColor="#fff">
+                                                <Icon name="ios-heart"
+                                                      type="ionicon"
+                                                      size={28}
+                                                      color={'#8d6fb9'}
+                                                />
+                                            </TouchableHighlight>
+                                            }
+                                        </View>
+                                    </View>
+
+                                    <View style={styles.rowStyle}>
+                                        <View style={styles.play}>
+                                            <TouchableHighlight style={styles.button} underlayColor="#fff">
+                                                <Icon name="ios-rewind"
+                                                      type="ionicon"
+                                                      size={36}
+                                                      color={'#000'}
+                                                />
+                                            </TouchableHighlight>
+                                        </View>
+                                    </View>
+                                    <View style={styles.rowStyle}>
+                                        <View style={styles.play}>
+                                            {this.props.isPlay === false &&
+                                            <TouchableHighlight style={styles.button} onPress={this.play} underlayColor="#fff">
+                                                <Icon name="ios-play"
+                                                      type="ionicon"
+                                                      size={48}
+                                                      color={'#000'}
+                                                />
+                                            </TouchableHighlight>
+                                            }
+                                            {this.props.isPlay === true &&
+                                            <TouchableHighlight style={styles.button} onPress={this.pause} underlayColor="#fff">
+                                                <Icon name="ios-pause"
+                                                      type="ionicon"
+                                                      size={48}
+                                                      color={'#000'}
+                                                />
+                                            </TouchableHighlight>
+                                            }
+                                        </View>
+                                    </View>
+                                    <View style={styles.rowStyle}>
+                                        <View style={styles.play}>
+                                            <TouchableHighlight style={styles.button} underlayColor="#fff">
+                                                <Icon name="ios-fastforward"
+                                                      type="ionicon"
+                                                      size={36}
+                                                      color={'#000'}
+                                                />
+                                            </TouchableHighlight>
+                                        </View>
+                                    </View>
+                                    <View style={styles.rowStyle}>
+                                        <View style={styles.play}>
+                                            <TouchableHighlight style={styles.button} underlayColor="#fff">
+                                                <Icon name="ios-more"
+                                                      type="ionicon"
+                                                      size={28}
+                                                      color={'#000'}
+                                                />
+                                            </TouchableHighlight>
+                                        </View>
+                                    </View>
+                                </View>
+                                <View style={{marginVertical:15, marginHorizontal:15, flexDirection:'row'}}>
+                                    <Icon name="ios-volume-mute"
+                                          type="ionicon"
+                                          size={20}
+                                          color={'#8d8e93'}
+                                    />
+                                    <Slider
+                                        onTouchStart={this.onSliderVolumeStart}
+                                        onTouchEnd={this.onSliderVolumeEnd}
+                                        onValueChange={this.onSliderVolumeEditing}
+                                        value={this.state.volume} maximumValue={1.0} maximumTrackTintColor='#8d8e93' minimumTrackTintColor='#8d6fb9' thumbTintColor='#8d6fb9'
+                                        style={{width: Dimensions.get('window').width - 120, alignSelf:'center', marginHorizontal: Platform.select({ios:5})}}
+                                        ref={(sliderVol) => this.sliderVol = sliderVol}/>
+                                    <Icon name="ios-volume-high"
+                                          type="ionicon"
+                                          size={20}
+                                          color={'#8d8e93'}
+                                    />
+                                </View>
                             </View>
                         </View>
-                    </View>
-                    <View style={styles.slide2}>
-                        <View style={styles.queue}>
-                            <Text style={styles.queueText}>Далее</Text>
-                            <SortableList
-                                style={styles.list}
-                                contentContainerStyle={styles.queueList}
-                                data={data}
-                                showsVerticalScrollIndicator={false}
-                                onPressRow={(key) => {ToastAndroid.show(key, ToastAndroid.SHORT)}}
-                                renderRow={this._renderRow} />
+                        <View style={styles.slide2}>
+                            <View style={styles.queue}>
+                                <Text style={styles.queueText}>Далее</Text>
+                                {
+                                    this.props.playlist.length !== 0 && this.props.playlist &&
+                                    <SortableList
+                                        style={styles.list}
+                                        contentContainerStyle={styles.queueList}
+                                        data={playlist}
+                                        showsVerticalScrollIndicator={false}
+                                        onPressRow={(key) => {ToastAndroid.show(key, ToastAndroid.SHORT)}}
+                                        renderRow={this._renderRow} />
+                                }
+                            </View>
                         </View>
-                    </View>
-                </Swiper>
-                <View style={{position: 'absolute', alignItems: 'center', width: Dimensions.get('window').width, height: 50, transform: [
-                        {translateX: 0},
-                        {translateY: Dimensions.get('window').height - 75}]}}>
-                    <View style={{flexDirection:'row'}}>
-                        {this.state.buttonRandom === false &&
-                            <View style={{marginRight: Dimensions.get('window').width - 250}}>
-                                <TouchableHighlight style={styles.button} underlayColor="#fff"
-                                                    onPress={this.onRandomButton}>
-                                    <Icon name="random"
-                                          type="font-awesome"
-                                          size={15}
-                                          color={'#000'}
-                                    />
-                                </TouchableHighlight>
-                            </View>
-                        }
-                        {this.state.buttonRandom === true &&
-                            <View style={{marginRight: Dimensions.get('window').width - 250}}>
-                                <TouchableHighlight style={styles.button} underlayColor="#fff"
-                                                    onPress={this.onRandomButton}>
-                                    <Icon name="random"
-                                          type="font-awesome"
-                                          size={15}
-                                          color={'#8d6fb9'}
-                                    />
-                                </TouchableHighlight>
-                            </View>
-                        }
-                        {this.state.buttonRepeat === 'disable' &&
-                            <View style={{marginLeft: Dimensions.get('window').width - 250}}>
-                                <TouchableHighlight style={styles.button} underlayColor="#fff"
-                                                    onPress={this.onRepeatButton}>
-                                    <Icon name="repeat"
-                                          type="material"
-                                          size={20}
-                                          color={'#000'}
-                                    />
-                                </TouchableHighlight>
-                            </View>
-                        }
-                        {this.state.buttonRepeat === 'enable' &&
-                            <View style={{marginLeft: Dimensions.get('window').width - 250}}>
-                                <TouchableHighlight style={styles.button} underlayColor="#fff"
-                                                    onPress={this.onRepeatButton}>
-                                    <Icon name="repeat"
-                                          type="material"
-                                          size={20}
-                                          color={'#8d6fb9'}
-                                    />
-                                </TouchableHighlight>
-                            </View>
-                        }
-                        {this.state.buttonRepeat === 'enable-one' &&
-                            <View style={{marginLeft: Dimensions.get('window').width - 250}}>
-                                <TouchableHighlight style={styles.button} underlayColor="#fff"
-                                                    onPress={this.onRepeatButton}>
-                                    <Icon name="repeat-one"
-                                          type="material"
-                                          size={20}
-                                          color={'#8d6fb9'}
-                                    />
-                                </TouchableHighlight>
-                            </View>
-                        }
+                    </Swiper>
+                    <View style={{position: 'absolute', alignItems: 'center', width: Dimensions.get('window').width, height: 50, transform: [
+                            {translateX: 0},
+                            {translateY: Dimensions.get('window').height - 75}]}}>
+                        <View style={{flexDirection:'row'}}>
+                            {this.state.buttonRandom === false &&
+                                <View style={{marginRight: Dimensions.get('window').width - 250}}>
+                                    <TouchableHighlight style={styles.button} underlayColor="#fff"
+                                                        onPress={this.onRandomButton}>
+                                        <Icon name="random"
+                                              type="font-awesome"
+                                              size={15}
+                                              color={'#000'}
+                                        />
+                                    </TouchableHighlight>
+                                </View>
+                            }
+                            {this.state.buttonRandom === true &&
+                                <View style={{marginRight: Dimensions.get('window').width - 250}}>
+                                    <TouchableHighlight style={styles.button} underlayColor="#fff"
+                                                        onPress={this.onRandomButton}>
+                                        <Icon name="random"
+                                              type="font-awesome"
+                                              size={15}
+                                              color={'#8d6fb9'}
+                                        />
+                                    </TouchableHighlight>
+                                </View>
+                            }
+                            {this.state.buttonRepeat === 'disable' &&
+                                <View style={{marginLeft: Dimensions.get('window').width - 250}}>
+                                    <TouchableHighlight style={styles.button} underlayColor="#fff"
+                                                        onPress={this.onRepeatButton}>
+                                        <Icon name="repeat"
+                                              type="material"
+                                              size={20}
+                                              color={'#000'}
+                                        />
+                                    </TouchableHighlight>
+                                </View>
+                            }
+                            {this.state.buttonRepeat === 'enable' &&
+                                <View style={{marginLeft: Dimensions.get('window').width - 250}}>
+                                    <TouchableHighlight style={styles.button} underlayColor="#fff"
+                                                        onPress={this.onRepeatButton}>
+                                        <Icon name="repeat"
+                                              type="material"
+                                              size={20}
+                                              color={'#8d6fb9'}
+                                        />
+                                    </TouchableHighlight>
+                                </View>
+                            }
+                            {this.state.buttonRepeat === 'enable-one' &&
+                                <View style={{marginLeft: Dimensions.get('window').width - 250}}>
+                                    <TouchableHighlight style={styles.button} underlayColor="#fff"
+                                                        onPress={this.onRepeatButton}>
+                                        <Icon name="repeat-one"
+                                              type="material"
+                                              size={20}
+                                              color={'#8d6fb9'}
+                                        />
+                                    </TouchableHighlight>
+                                </View>
+                            }
+                        </View>
                     </View>
                 </View>
-            </View>
+            </Provider>
         )
     }
 }
@@ -616,5 +555,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default FullPlayer;
-// export default connect()(FullPlayer)
+export default connect()(FullPlayer)

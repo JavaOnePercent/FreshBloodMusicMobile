@@ -3,7 +3,9 @@ import {
     FETCH_NEWS_FAIL,
     FETCH_EDITION_CLEAR,
     FETCH_EDITION_SUCCESS,
-    FETCH_EDITION_FAIL
+    FETCH_EDITION_FAIL,
+    EDITION_SELECT_TRACK,
+    EDITION_DELETE_TRACK
 } from '../actions/types';
 import React from 'react';
 import {ToastAndroid} from 'react-native';

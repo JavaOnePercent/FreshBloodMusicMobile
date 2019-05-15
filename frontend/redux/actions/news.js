@@ -3,7 +3,8 @@ import { ADDRESS_SERVER } from '../../components/constants/constants';
 import {
     FETCH_EDITION_CLEAR,
     FETCH_NEWS_SUCCESS,
-    FETCH_EDITION_SUCCESS
+    FETCH_EDITION_SUCCESS,
+    EDITION_SELECT_TRACK, EDITION_DELETE_TRACK
 } from '../actions/types';
 
 export const getNews = (sort) => async dispatch => {

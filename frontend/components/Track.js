@@ -21,7 +21,7 @@ class Track extends Component {
                 <View style={styles.rowStyle}>
                     <View style={styles.iconAlbum}>
                         <Image
-                            source={{uri: data.image}}
+                            source={{uri: data.cover}}
                             style={{width: 50, height: 50, borderRadius: 3}}
                         />
                     </View>
@@ -33,8 +33,8 @@ class Track extends Component {
                         marginLeft: 10,
                         marginTop: 12
                     }}>
-                        <Text style={styles.titleTrack}>{data.nameTrack}</Text>
-                        <Text style={styles.titlePerformer}>{data.namePerformer}</Text>
+                        <Text style={styles.titleTrack}>{data.title}</Text>
+                        <Text style={styles.titlePerformer}>{data.performer}</Text>
                     </View>
                 </View>
                 <View style={styles.rowStyle}>
