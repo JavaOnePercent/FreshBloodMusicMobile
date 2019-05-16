@@ -4,9 +4,7 @@ import {
     Text,
     StyleSheet,
     TouchableHighlight,
-    RefreshControl,
     ScrollView,
-    Dimensions,
     ToastAndroid,
     ActivityIndicator
 } from 'react-native';
@@ -14,7 +12,7 @@ import {Icon, Image, ListItem} from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { Provider, connect } from 'react-redux';
 import store from "../redux/store";
-import {addEditionQueue, addTrackQueue, playPlayer} from "../redux/actions/player";
+import {addEditionQueue, addTrackQueue, playPlayer, releasePlayer, createPrevious, addCurrent, createQueue} from "../redux/actions/player";
 
 class Playlist extends Component {
     constructor(props) {
@@ -105,10 +103,43 @@ class Playlist extends Component {
         });
     }
 
-    play()
+    play(index)
     {
-        this.addPlaylist();
-        this.props.onPressPlayButton();
+        if(index)
+        {
+            let prev = []
+            let queue = []
+            this.props.edition.map((l, i) =>
+                {
+                    if(i < index)
+                    {
+                        prev.push({id: l.id, performer: this.props.namePerformer, cover: this.props.iconAlbum,
+                            title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                            isLiked: l.is_liked})
+                    }
+                    else if(i >= index)
+                    {
+                        queue.push({id: l.id, performer: this.props.namePerformer, cover: this.props.iconAlbum,
+                            title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                            isLiked: l.is_liked})
+                    }
+                }
+            )
+            this.props.onCreatePrevious(prev)
+            this.props.onCreateQueue(queue)
+            this.props.onPressReleasePlayButton(this.props.tracks[index].audio_trc);
+        }
+        else
+        {
+            let queue = []
+            this.props.edition.map((l, i) => (
+                queue.push({id: l.id, performer: this.props.namePerformer, cover: this.props.iconAlbum,
+                    title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                    isLiked: l.is_liked})
+            ))
+            this.props.onCreateQueue(queue)
+            this.props.onPressReleasePlayButton(this.props.tracks[0].audio_trc);
+        }
     }
 
 
@@ -188,7 +219,7 @@ class Playlist extends Component {
                                 </View>
                             }
                             <View style={styles.buttonRowStyle}>
-                                <TouchableHighlight style={styles.button} onPress={this.play} underlayColor="#fff" >
+                                <TouchableHighlight style={styles.button} onPress={() => this.play(null)} underlayColor="#fff" >
                                     <Icon name="ios-play"
                                           type="ionicon"
                                           size={30}
@@ -220,7 +251,7 @@ class Playlist extends Component {
                                 this.state.isTrack === false &&
                                 this.props.tracks.length !== 0 &&
                                 this.props.tracks.map((l, i) => (
-                                    <TouchableHighlight onPress={() => {ToastAndroid.show(l.audio_trc, ToastAndroid.SHORT)}} onLongPress={this.onPressLong.bind(this, l)} style={{height: 40, justifyContent: 'center'}} underlayColor="#fff">
+                                    <TouchableHighlight onPress={() => this.play(i)} onLongPress={this.onPressLong.bind(this, l)} style={{height: 40, justifyContent: 'center'}} underlayColor="#fff">
                                         <View style={styles.listTrack}>
                                             <View style={styles.rowIconOrNumberStyle}>
                                                 <Text style={styles.textNumber}>{l.id}</Text>
@@ -441,11 +472,23 @@ export default connect(
         onPressPlayButton: () => {
             dispatch(playPlayer());
         },
+        onPressReleasePlayButton: (audio) => {
+            dispatch(releasePlayer(audio));
+        },
         onAddTrackQueue: (track) => {
             dispatch(addTrackQueue(track));
         },
         onAddEditionQueue: (edition) => {
             dispatch(addEditionQueue(edition));
+        },
+        onCreatePrevious: (tracks) => {
+            dispatch(createPrevious(tracks));
+        },
+        onAddCurrent: (track) => {
+            dispatch(addCurrent(track));
+        },
+        onCreateQueue: (tracks) => {
+            dispatch(createQueue(tracks));
         }
     })
 )(Playlist)

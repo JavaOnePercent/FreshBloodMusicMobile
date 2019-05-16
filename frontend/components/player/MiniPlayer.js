@@ -3,7 +3,7 @@ import {View, Text, StyleSheet, TouchableHighlight, RefreshControl, ScrollView, 
 import {Image, ListItem} from 'react-native-elements/src/index';
 import PropTypes from 'prop-types';
 import { Provider, connect } from 'react-redux';
-import Icon from "react-native-vector-icons/Ionicons";
+import { Icon } from 'react-native-elements';
 import { PlayerAction } from "../../redux/actions/player";
 import store from "../../redux/store";
 
@@ -24,7 +24,7 @@ class MiniPlayer extends Component {
         pauseTrack: PropTypes.func.isRequired,
         nextTrack: PropTypes.func.isRequired,
         openPlayer: PropTypes.func.isRequired,
-        isPlay: PropTypes.bool.isRequired,
+        isPlay: PropTypes.string.isRequired,
     }
 
     componentDidMount()
@@ -85,17 +85,19 @@ class MiniPlayer extends Component {
                                 </View>
                                 <View style={styles.rowStyle}>
                                     <View style={styles.play}>
-                                        {this.props.isPlay === false &&
+                                        {(this.props.isPlay === 'pause' || this.props.isPlay === '') &&
                                             <TouchableHighlight style={styles.button} onPress={this.play} underlayColor="#fff">
                                                 <Icon name="ios-play"
+                                                      type="ionicon"
                                                       size={30}
                                                       color={'#000'}
                                                 />
                                             </TouchableHighlight>
                                         }
-                                        {this.props.isPlay === true &&
+                                        {(this.props.isPlay !== 'pause' && this.props.isPlay !== '') &&
                                             <TouchableHighlight style={styles.button} onPress={this.pause} underlayColor="#fff">
                                                 <Icon name="ios-pause"
+                                                      type="ionicon"
                                                       size={30}
                                                       color={'#000'}
                                                 />
@@ -107,6 +109,7 @@ class MiniPlayer extends Component {
                                     <View style={styles.next}>
                                         <TouchableHighlight style={styles.button} onPress={nextTrack} underlayColor="#fff">
                                             <Icon name="ios-fastforward"
+                                                  type="ionicon"
                                                   size={30}
                                                   color={'#000'}
                                             />

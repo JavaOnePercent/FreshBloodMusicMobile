@@ -49,7 +49,7 @@ class Podcasts extends Component {
         headerStyle: {backgroundColor:'#8d6fb9'},
         headerTintColor:'white',
         headerBackTitle: null,
-        title: 'Чарты'
+        title: 'Поиск'
     };
 
     _refresh = async() => {

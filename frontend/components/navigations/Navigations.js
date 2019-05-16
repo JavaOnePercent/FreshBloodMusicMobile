@@ -6,7 +6,7 @@ import {connect, Provider} from 'react-redux';
 import { createAppContainer, createStackNavigator, createBottomTabNavigator, createSwitchNavigator } from 'react-navigation';
 
 import store from "../../redux/store";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { Icon } from 'react-native-elements';
 
 import Loading from "../../views/loading/Loading";
 
@@ -68,6 +68,7 @@ const MainAppStack = createBottomTabNavigator({
                 tabBarIcon: ({tintColor}) => (
                     <View>
                         <Icon name="newspaper-o"
+                              type="font-awesome"
                               size={24}
                               color={tintColor}
                         />
@@ -85,6 +86,7 @@ const MainAppStack = createBottomTabNavigator({
                 tabBarIcon: ({tintColor}) => (
                     <View>
                         <Icon name="trophy"
+                              type="font-awesome"
                               size={24}
                               color={tintColor}
                         />
@@ -103,18 +105,31 @@ const MainAppStack = createBottomTabNavigator({
                 tabBarLabel: 'Избранное',
                 tabBarIcon: ({tintColor}) => (
                     <Icon name="heart"
+                          type="font-awesome"
                           size={24}
+                          color={tintColor}
+                    />
+                ),
+            })},
+        Radio: { screen: TabRadioStack,
+            navigationOptions: ({navigation}) => ({
+                tabBarLabel: 'Радио',
+                tabBarIcon: ({tintColor}) => (
+                    <Icon name="ios-megaphone"
+                          type="ionicon"
+                          size={30}
                           color={tintColor}
                     />
                 ),
             })},
         Podcasts: { screen: TabPodcastsStack,
             navigationOptions: ({navigation}) => ({
-                tabBarLabel: 'Подкасты',
+                tabBarLabel: 'Поиск',
                 tabBarIcon: ({tintColor}) => (
                     <View>
-                        <Icon name="podcast"
-                              size={24}
+                        <Icon name="ios-search"
+                              type="ionicon"
+                              size={30}
                               color={tintColor}
                         />
                         {/*<Badge*/}
@@ -123,16 +138,6 @@ const MainAppStack = createBottomTabNavigator({
                         {/*    containerStyle={{ position: 'absolute', top: -4, right: -4 }}*/}
                         {/*/>*/}
                     </View>
-                ),
-            })},
-        Radio: { screen: TabRadioStack,
-            navigationOptions: ({navigation}) => ({
-                tabBarLabel: 'Радио',
-                tabBarIcon: ({tintColor}) => (
-                    <Icon name="bullhorn"
-                          size={24}
-                          color={tintColor}
-                    />
                 ),
             })},
     },

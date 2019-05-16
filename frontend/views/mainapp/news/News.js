@@ -109,7 +109,7 @@ class News extends Component {
                     {Platform.OS === 'android' &&
                     <SearchBar
                         platform="android"
-                        placeholder="Поиск групп, музыки, подкастов..."
+                        placeholder="Поиск групп, изданий, треков..."
                         onChangeText={this.updateSearch}
                         inputContainerStyle={{backgroundColor: '#fff'}}
                         value={this.state.search}
@@ -120,7 +120,7 @@ class News extends Component {
                     {Platform.OS === 'ios' &&
                     <SearchBar
                         platform="ios"
-                        placeholder="Поиск групп, музыки, подкастов..."
+                        placeholder="Поиск групп, изданий, треков..."
                         onChangeText={this.updateSearch}
                         inputContainerStyle={{backgroundColor: '#fff'}}
                         value={this.state.search}

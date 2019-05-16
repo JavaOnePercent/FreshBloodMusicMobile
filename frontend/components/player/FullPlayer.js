@@ -44,7 +44,7 @@ class FullPlayer extends Component {
         nextTrack: PropTypes.func.isRequired,
         sound: PropTypes.object.isRequired,
         closePlayer: PropTypes.func.isRequired,
-        isPlay: PropTypes.bool.isRequired,
+        isPlay: PropTypes.string.isRequired,
         playlist: PropTypes.array.isRequired
     }
 
@@ -300,7 +300,7 @@ class FullPlayer extends Component {
                                     </View>
                                     <View style={styles.rowStyle}>
                                         <View style={styles.play}>
-                                            {this.props.isPlay === false &&
+                                            {(this.props.isPlay === 'pause') &&
                                             <TouchableHighlight style={styles.button} onPress={this.play} underlayColor="#fff">
                                                 <Icon name="ios-play"
                                                       type="ionicon"
@@ -309,7 +309,7 @@ class FullPlayer extends Component {
                                                 />
                                             </TouchableHighlight>
                                             }
-                                            {this.props.isPlay === true &&
+                                            {(this.props.isPlay !== 'pause') &&
                                             <TouchableHighlight style={styles.button} onPress={this.pause} underlayColor="#fff">
                                                 <Icon name="ios-pause"
                                                       type="ionicon"
@@ -334,8 +334,8 @@ class FullPlayer extends Component {
                                     <View style={styles.rowStyle}>
                                         <View style={styles.play}>
                                             <TouchableHighlight style={styles.button} underlayColor="#fff">
-                                                <Icon name="ios-more"
-                                                      type="ionicon"
+                                                <Icon name="microphone-variant"
+                                                      type="material-community"
                                                       size={28}
                                                       color={'#000'}
                                                 />

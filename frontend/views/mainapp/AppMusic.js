@@ -40,16 +40,54 @@ class AppMusic extends React.Component {
     {
         if(prevState.isPlay !== this.props.isPlay)
         {
-            if(this.props.isPlay === true)
+            if(this.props.isPlay === 'play')
             {
                 this.play(null);
             }
-            else if(this.props.isPlay === false)
+            else if(this.props.isPlay === 'pause')
             {
                 this.pause();
             }
+            else if(this.props.isPlay !== '')
+            {
+                if(this.sound !== undefined)
+                {
+                    this.sound.release();
+                }
+                this.play({audio: this.props.isPlay});
+                this.props.onAddCurrent(this.props.queue[0]);
+                this.props.onDeleteTrackQueue();
+            }
         }
     }
+    //
+    // state = {
+    //     tracks: [],
+    //     current: {},
+    //     queue: []
+    // }
+    //
+    // static getDerivedStateFromProps(nextProps, prevState) {
+    //
+    //     if(prevState.previous !== nextProps.previous)
+    //     {
+    //         return {
+    //             previous: nextProps.previous
+    //         }
+    //     }
+    //     else if(prevState.current !== nextProps.current)
+    //     {
+    //         return {
+    //             current: nextProps.current
+    //         }
+    //     }
+    //     else if(prevState.queue !== nextProps.queue)
+    //     {
+    //         return {
+    //             queue: nextProps.queue
+    //         }
+    //     }
+    // }
 
     open()
     {
@@ -73,11 +111,16 @@ class AppMusic extends React.Component {
 
     play(track)
     {
-        if(this.props.queue.length !== 0 && this.sound === undefined)
+        if(this.props.queue.length !== 0 && track === null && this.sound === undefined)
         {
             track = this.props.queue[0]
             this.props.onAddCurrent(track)
             this.props.onDeleteTrackQueue()
+        }
+        else if(this.props.queue.length === 0 && track === null && this.sound === undefined)
+        {
+            ToastAndroid.show('Найди сначала музыку для плеера', ToastAndroid.SHORT);
+
         }
         if(track !== null)
         {
@@ -105,7 +148,7 @@ class AppMusic extends React.Component {
                 }
             });
         }
-        else if(this.sound !== undefined)
+        else
         {
             this.sound.play((success) => {
                 if (success) {
@@ -123,10 +166,6 @@ class AppMusic extends React.Component {
                 }
             });
         }
-        else if(this.sound === undefined && track === null)
-        {
-            ToastAndroid.show('Найди сначала музыку для плеера', ToastAndroid.SHORT);
-        }
     }
 
     pause()
@@ -143,6 +182,7 @@ class AppMusic extends React.Component {
             this.props.onAddBeginQueue(this.props.current)
             this.props.onAddCurrent(this.props.previous[this.props.previous.length - 1])
             this.props.onDeleteTrackPrevious()
+            this.props.onPressPlayButton()
         }
     }
 
@@ -155,6 +195,7 @@ class AppMusic extends React.Component {
             this.props.onAddTrackPrevious(this.props.current)
             this.props.onAddCurrent(this.props.queue[0])
             this.props.onDeleteTrackQueue()
+            this.props.onPressPlayButton()
         }
     }
 
