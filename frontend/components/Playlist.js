@@ -14,7 +14,7 @@ import {Icon, Image, ListItem} from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { Provider, connect } from 'react-redux';
 import store from "../redux/store";
-import {addEditionQueue, addTrackQueue} from "../redux/actions/player";
+import {addEditionQueue, addTrackQueue, playPlayer} from "../redux/actions/player";
 
 class Playlist extends Component {
     constructor(props) {
@@ -30,6 +30,7 @@ class Playlist extends Component {
         }
 
         this.back = this.back.bind(this)
+        this.play = this.play.bind(this)
         this.addPlaylist = this.addPlaylist.bind(this)
     }
 
@@ -101,10 +102,14 @@ class Playlist extends Component {
             audioTrack: '',
             durationTrack: 0,
             isLikedTrack: false
-
         });
     }
 
+    play()
+    {
+        this.addPlaylist();
+        this.props.onPressPlayButton();
+    }
 
 
     render() {
@@ -183,7 +188,7 @@ class Playlist extends Component {
                                 </View>
                             }
                             <View style={styles.buttonRowStyle}>
-                                <TouchableHighlight style={styles.button} underlayColor="#fff" >
+                                <TouchableHighlight style={styles.button} onPress={this.play} underlayColor="#fff" >
                                     <Icon name="ios-play"
                                           type="ionicon"
                                           size={30}
@@ -268,7 +273,7 @@ class Playlist extends Component {
                                         <TouchableHighlight onPress={() => {ToastAndroid.show(this.state.titleTrack, ToastAndroid.SHORT)}} underlayColor="#fff">
                                             <View style={styles.listTrack}>
                                                 <View style={styles.rowPlaylistStyle}>
-                                                    <Text style={styles.textName}>Говной воняет</Text>
+                                                    <Text style={styles.textName}>Очень плохая музыка</Text>
                                                 </View>
                                                 <View style={styles.rowIconOrNumberStyle}>
                                                     <Icon name="ios-add"
@@ -431,8 +436,11 @@ const styles = StyleSheet.create({
 });
 
 export default connect(
-    state => ({edition: state.edition}),
+    state => ({isPlay: state.player, edition: state.edition}),
     dispatch => ({
+        onPressPlayButton: () => {
+            dispatch(playPlayer());
+        },
         onAddTrackQueue: (track) => {
             dispatch(addTrackQueue(track));
         },

@@ -8,9 +8,8 @@ import MiniPlayer from "../../components/player/MiniPlayer";
 import FullPlayer from "../../components/player/FullPlayer";
 
 import Sound from 'react-native-sound';
-import {playPlayer, pausePlayer} from "../../redux/actions/player";
+import {playPlayer, pausePlayer, addTrackPrevious, addBeginQueue, addCurrent, deleteTrackPrevious, deleteTrackQueue} from "../../redux/actions/player";
 import PropTypes from "prop-types";
-import {ADDRESS_SERVER} from "../../components/constants/constants";
 
 class AppMusic extends React.Component {
 
@@ -23,14 +22,33 @@ class AppMusic extends React.Component {
             isOpenPlayer: false
         }
         this.open = this.open.bind(this)
+        this.close = this.close.bind(this)
         this.play = this.play.bind(this)
         this.pause = this.pause.bind(this)
-        this.close = this.close.bind(this)
+        this.run = this.run.bind(this)
+        this.stop = this.stop.bind(this)
+        this.prev = this.prev.bind(this)
+        this.next = this.next.bind(this)
     }
 
     componentDidMount()
     {
 
+    }
+
+    componentDidUpdate(prevState)
+    {
+        if(prevState.isPlay !== this.props.isPlay)
+        {
+            if(this.props.isPlay === true)
+            {
+                this.play(null);
+            }
+            else if(this.props.isPlay === false)
+            {
+                this.pause();
+            }
+        }
     }
 
     open()
@@ -43,77 +61,135 @@ class AppMusic extends React.Component {
         this.setState({isOpenPlayer: false});
     }
 
-    play()
+    run()
     {
         this.props.onPressPlayButton()
-        if(this.sound === undefined)
-        {
+    }
 
-            this.sound = new Sound(ADDRESS_SERVER + '/media/albums/2/1.mp3', Sound.MAIN_BUNDLE, (error) => {
+    stop()
+    {
+        this.props.onPressPauseButton()
+    }
+
+    play(track)
+    {
+        if(this.props.queue.length !== 0 && this.sound === undefined)
+        {
+            track = this.props.queue[0]
+            this.props.onAddCurrent(track)
+            this.props.onDeleteTrackQueue()
+        }
+        if(track !== null)
+        {
+            this.sound = new Sound(track.audio, Sound.MAIN_BUNDLE, (error) => {
                 if (error) {
                     ToastAndroid.show('Error', ToastAndroid.SHORT);
                 } else {
                     this.sound.play((success) => {
                         if (success)
                         {
-                            ToastAndroid.show('Success', ToastAndroid.SHORT);
+                            if(this.props.queue.length > 0)
+                            {
+                                ToastAndroid.show('Success', ToastAndroid.SHORT);
+                                this.sound.release();
+                                this.play(this.props.queue[0]);
+                                this.props.onAddTrackPrevious(this.props.current)
+                                this.props.onAddCurrent(this.props.queue[0])
+                                this.props.onDeleteTrackQueue()
+                            }
                         }
-                        else
-                        {
+                        else {
                             ToastAndroid.show('Error', ToastAndroid.SHORT);
                         }
                     });
                 }
             });
         }
-        else
+        else if(this.sound !== undefined)
         {
             this.sound.play((success) => {
                 if (success) {
-                    ToastAndroid.show('Success', ToastAndroid.SHORT);
+                    if(this.props.queue.length > 0)
+                    {
+                        ToastAndroid.show('Success', ToastAndroid.SHORT);
+                        this.sound.release();
+                        this.play(this.props.queue[0]);
+                        this.props.onAddTrackPrevious(this.props.current)
+                        this.props.onAddCurrent(this.props.queue[0])
+                        this.props.onDeleteTrackQueue()
+                    }
                 } else {
                     ToastAndroid.show('Error', ToastAndroid.SHORT);
                 }
             });
         }
-
+        else if(this.sound === undefined && track === null)
+        {
+            ToastAndroid.show('Найди сначала музыку для плеера', ToastAndroid.SHORT);
+        }
     }
 
     pause()
     {
-        this.props.onPressPauseButton()
         this.sound.pause();
     }
 
+    prev()
+    {
+        if(this.props.previous.length > 0)
+        {
+            this.sound.release();
+            this.play(this.props.previous[this.props.previous.length - 1]);
+            this.props.onAddBeginQueue(this.props.current)
+            this.props.onAddCurrent(this.props.previous[this.props.previous.length - 1])
+            this.props.onDeleteTrackPrevious()
+        }
+    }
+
+    next()
+    {
+        if(this.props.queue.length > 0)
+        {
+            this.sound.release();
+            this.play(this.props.queue[0]);
+            this.props.onAddTrackPrevious(this.props.current)
+            this.props.onAddCurrent(this.props.queue[0])
+            this.props.onDeleteTrackQueue()
+        }
+    }
+
     render() {
+
+        const { current, queue } = this.props;
+
         return (
             <Provider store={store}>
                 <View style={styles.container}>
                     <Navigations />
                     <View style={styles.smallPlayer}>
                         <MiniPlayer
-                            iconAlbum={ADDRESS_SERVER + '/media/albums/2/logo.jpg'}
-                            namePerformer={'Twenty One Pilots'}
-                            nameTrack={'Stressed Out'}
-                            playTrack={this.play}
-                            pauseTrack={this.pause}
+                            iconAlbum={current.cover}
+                            nameTrack={current.title}
+                            playTrack={this.run}
+                            pauseTrack={this.stop}
                             openPlayer={this.open}
+                            nextTrack={this.next}
                             isPlay={this.props.isPlay}/>
                     </View>
                     {this.state.isOpenPlayer === true &&
                         <View style={styles.fullPlayer}>
-                            {/*<ScrollView showsVerticalScrollIndicator={false} horizontal={false}>*/}
-                                <FullPlayer
-                                iconAlbum={ADDRESS_SERVER + '/media/albums/2/logo.jpg'}
-                                namePerformer={'Twenty One Pilots'}
-                                nameTrack={'Stressed Out'}
-                                playTrack={this.play}
-                                pauseTrack={this.pause}
-                                sound={this.sound}
+                            <FullPlayer
+                                iconAlbum={current.cover}
+                                namePerformer={current.performer}
+                                nameTrack={current.title}
+                                playTrack={this.run}
+                                pauseTrack={this.stop}
                                 closePlayer={this.close}
+                                prevTrack={this.prev}
+                                nextTrack={this.next}
+                                sound={this.sound}
                                 isPlay={this.props.isPlay}
-                                playlist={this.props.queue}/>
-                            {/*</ScrollView>*/}
+                                playlist={queue}/>
                         </View>
                     }
                 </View>
@@ -139,13 +215,28 @@ const styles = StyleSheet.create({
 });
 
 export default connect(
-    state => ({isPlay: state.player, queue: state.queue}),
+    state => ({isPlay: state.player, previous: state.previous, current: state.current, queue: state.queue}),
     dispatch => ({
         onPressPlayButton: () => {
             dispatch(playPlayer());
         },
         onPressPauseButton: () => {
             dispatch(pausePlayer());
+        },
+        onAddTrackPrevious: (track) => {
+            dispatch(addTrackPrevious(track));
+        },
+        onAddBeginQueue: (track) => {
+            dispatch(addBeginQueue(track));
+        },
+        onAddCurrent: (track) => {
+            dispatch(addCurrent(track));
+        },
+        onDeleteTrackPrevious: () => {
+            dispatch(deleteTrackPrevious());
+        },
+        onDeleteTrackQueue: () => {
+            dispatch(deleteTrackQueue());
         }
     })
 )(AppMusic)

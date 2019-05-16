@@ -19,10 +19,10 @@ class MiniPlayer extends Component {
 
     static propTypes = {
         iconAlbum: PropTypes.string.isRequired,
-        namePerformer: PropTypes.string.isRequired,
         nameTrack: PropTypes.string.isRequired,
         playTrack: PropTypes.func.isRequired,
         pauseTrack: PropTypes.func.isRequired,
+        nextTrack: PropTypes.func.isRequired,
         openPlayer: PropTypes.func.isRequired,
         isPlay: PropTypes.bool.isRequired,
     }
@@ -44,7 +44,7 @@ class MiniPlayer extends Component {
 
     render() {
 
-        const { iconAlbum, namePerformer, nameTrack, openPlayer } = this.props;
+        const { iconAlbum, nameTrack, nextTrack, openPlayer } = this.props;
         return (
                 <Provider store={store}>
                     <View style={styles.container}>
@@ -54,15 +54,33 @@ class MiniPlayer extends Component {
                             <View style={styles.playerContainer}>
                                 <View style={styles.rowStyle}>
                                     <View style={styles.iconAlbum}>
-                                        <Image
-                                            source={{uri: iconAlbum}}
-                                            style={{width: 50, height: 50, borderRadius: 3}}
-                                        />
+                                        {
+                                            nameTrack &&
+                                            <Image
+                                                source={{uri: iconAlbum}}
+                                                style={{width: 50, height: 50, borderRadius: 3}}
+                                            />
+                                        }
+                                        {
+                                            !nameTrack &&
+                                            <Image
+                                                source={require('../../icons/default-cover.png')}
+                                                style={{width: 50, height: 50}}
+                                            />
+
+                                        }
                                     </View>
                                 </View>
                                 <View style={styles.rowStyle}>
                                     <View style={styles.nameTrack}>
-                                        <Text style={styles.title}>{nameTrack}</Text>
+                                        {
+                                            nameTrack &&
+                                            <Text style={styles.title}>{nameTrack}</Text>
+                                        }
+                                        {
+                                            !nameTrack &&
+                                            <Text style={styles.title}>{'Не исполняется'}</Text>
+                                        }
                                     </View>
                                 </View>
                                 <View style={styles.rowStyle}>
@@ -87,7 +105,7 @@ class MiniPlayer extends Component {
                                 </View>
                                 <View style={styles.rowStyle}>
                                     <View style={styles.next}>
-                                        <TouchableHighlight style={styles.button} onPress={this.play} underlayColor="#fff">
+                                        <TouchableHighlight style={styles.button} onPress={nextTrack} underlayColor="#fff">
                                             <Icon name="ios-fastforward"
                                                   size={30}
                                                   color={'#000'}

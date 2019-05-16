@@ -40,6 +40,8 @@ class FullPlayer extends Component {
         nameTrack: PropTypes.string.isRequired,
         playTrack: PropTypes.func.isRequired,
         pauseTrack: PropTypes.func.isRequired,
+        prevTrack: PropTypes.func.isRequired,
+        nextTrack: PropTypes.func.isRequired,
         sound: PropTypes.object.isRequired,
         closePlayer: PropTypes.func.isRequired,
         isPlay: PropTypes.bool.isRequired,
@@ -212,7 +214,7 @@ class FullPlayer extends Component {
         const currentTimeString = FullPlayer.getAudioTimeString(this.state.playSeconds);
         const durationString = FullPlayer.getAudioTimeString(this.state.showDuration);
 
-        const { iconAlbum, namePerformer, nameTrack, closePlayer, playlist } = this.props;
+        const { iconAlbum, namePerformer, nameTrack, prevTrack, nextTrack, closePlayer, playlist } = this.props;
         return (
             <Provider store={store}>
                 <View style={styles.container}>
@@ -228,10 +230,21 @@ class FullPlayer extends Component {
                         <View style={styles.slide1}>
                             <View style={styles.bigPlayer}>
                                 <View style={styles.imageAlbum}>
-                                    <Image
-                                        source={{uri: iconAlbum}}
-                                        style={{width: 250, height: 250, borderRadius: 7}}
-                                    />
+                                    {
+                                        nameTrack &&
+                                        <Image
+                                            source={{uri: iconAlbum}}
+                                            style={{width: 250, height: 250, borderRadius: 7}}
+                                        />
+                                    }
+                                    {
+                                        !nameTrack &&
+                                        <Image
+                                            source={require('../../icons/default-cover.png')}
+                                            style={{width: 250, height: 250}}
+                                        />
+
+                                    }
                                 </View>
                                 <Slider
                                     onTouchStart={this.onSliderTrackStart}
@@ -243,7 +256,14 @@ class FullPlayer extends Component {
                                     <Text style={{color:'#8d8e93', marginRight: Dimensions.get('window').width / 2 - 81}}>{currentTimeString}</Text>
                                     <Text style={{color:'#8d8e93', marginLeft: Dimensions.get('window').width / 2 - 83}}>-{durationString}</Text>
                                 </View>
-                                <Text style={styles.nameTrack}>{nameTrack}</Text>
+                                {
+                                    nameTrack &&
+                                    <Text style={styles.nameTrack}>{nameTrack}</Text>
+                                }
+                                {
+                                    !nameTrack &&
+                                    <Text style={styles.nameTrack}>{'Не исполняется'}</Text>
+                                }
                                 <Text style={styles.namePerformer}>{namePerformer}</Text>
                                 <View style={styles.buttonContainer}>
                                     <View style={styles.rowStyle}>
@@ -269,7 +289,7 @@ class FullPlayer extends Component {
 
                                     <View style={styles.rowStyle}>
                                         <View style={styles.play}>
-                                            <TouchableHighlight style={styles.button} underlayColor="#fff">
+                                            <TouchableHighlight style={styles.button} onPress={prevTrack} underlayColor="#fff">
                                                 <Icon name="ios-rewind"
                                                       type="ionicon"
                                                       size={36}
@@ -302,7 +322,7 @@ class FullPlayer extends Component {
                                     </View>
                                     <View style={styles.rowStyle}>
                                         <View style={styles.play}>
-                                            <TouchableHighlight style={styles.button} underlayColor="#fff">
+                                            <TouchableHighlight style={styles.button} onPress={nextTrack} underlayColor="#fff">
                                                 <Icon name="ios-fastforward"
                                                       type="ionicon"
                                                       size={36}
