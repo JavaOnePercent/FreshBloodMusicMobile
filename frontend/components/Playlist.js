@@ -12,7 +12,21 @@ import {Icon, Image, ListItem} from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { Provider, connect } from 'react-redux';
 import store from "../redux/store";
-import {addEditionQueue, addTrackQueue, playPlayer, releasePlayer, createPrevious, addCurrent, createQueue} from "../redux/actions/player";
+import {
+    addEditionQueue,
+    addEditionQueueRandom,
+    addTrackQueue,
+    addTrackQueueRandom,
+    playPlayer,
+    releasePlayer,
+    createPrevious,
+    addCurrent,
+    createQueue,
+    createCommonMusic,
+    createQueueRandom,
+    createRandomMusic,
+    shuffleListTrack,
+} from "../redux/actions/player";
 
 class Playlist extends Component {
     constructor(props) {
@@ -20,6 +34,7 @@ class Playlist extends Component {
         this.state = {
             isTrack: false,
             idTrack: -1,
+            indexTrack: -1,
             titleTrack: '',
             audioTrack: '',
             durationTrack: 0,
@@ -29,6 +44,7 @@ class Playlist extends Component {
 
         this.back = this.back.bind(this)
         this.play = this.play.bind(this)
+        this.randomPlay = this.randomPlay.bind(this)
         this.addPlaylist = this.addPlaylist.bind(this)
     }
 
@@ -58,11 +74,12 @@ class Playlist extends Component {
         }
     }
 
-    onPressLong(l)
+    onPressLong(i, l)
     {
         this.setState({
             isTrack: true,
             idTrack: l.id,
+            indexTrack: i,
             titleTrack: l.name_trc,
             audioTrack: l.audio_trc,
             durationTrack: l.duration,
@@ -78,6 +95,12 @@ class Playlist extends Component {
             this.props.onAddTrackQueue({id: this.state.idTrack, performer: this.props.namePerformer, cover: this.props.iconAlbum,
                 title: this.state.titleTrack, audio: this.state.audioTrack, duration: this.state.durationTrack,
                 isLiked: this.state.isLikedTrack})
+            if(this.props.random)
+            {
+                this.props.onAddTrackQueueRandom({id: this.state.idTrack, performer: this.props.namePerformer, cover: this.props.iconAlbum,
+                    title: this.state.titleTrack, audio: this.state.audioTrack, duration: this.state.durationTrack,
+                    isLiked: this.state.isLikedTrack})
+            }
         }
         else
         {
@@ -88,6 +111,10 @@ class Playlist extends Component {
                     isLiked: l.is_liked})
             ))
             this.props.onAddEditionQueue(edition)
+            if(this.props.random)
+            {
+                this.props.onAddEditionQueueRandom(edition)
+            }
         }
     }
 
@@ -96,6 +123,7 @@ class Playlist extends Component {
         this.setState({
             isTrack: false,
             idTrack: -1,
+            indexTrack: -1,
             titleTrack: '',
             audioTrack: '',
             durationTrack: 0,
@@ -105,6 +133,7 @@ class Playlist extends Component {
 
     play(index)
     {
+        this.props.onCreateCommonMusic();
         if(index)
         {
             let prev = []
@@ -140,6 +169,21 @@ class Playlist extends Component {
             this.props.onCreateQueue(queue)
             this.props.onPressReleasePlayButton(this.props.tracks[0].audio_trc);
         }
+    }
+
+    randomPlay()
+    {
+        this.props.onCreateRandomMusic();
+        let queue = []
+        this.props.edition.map((l, i) => (
+            queue.push({id: l.id, performer: this.props.namePerformer, cover: this.props.iconAlbum,
+                title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                isLiked: l.is_liked})
+        ))
+        let randomQueue = shuffleListTrack(queue);
+        this.props.onCreateQueue(queue);
+        this.props.onCreateQueueRandom(randomQueue);
+        this.props.onPressReleasePlayButton(randomQueue[0].audio);
     }
 
 
@@ -197,7 +241,7 @@ class Playlist extends Component {
                             {
                                 this.state.isTrack === false &&
                                 <View style={styles.buttonRowStyle}>
-                                    <TouchableHighlight style={styles.button} underlayColor="#fff" >
+                                    <TouchableHighlight style={styles.button} onPress={this.randomPlay} underlayColor="#fff" >
                                         <Icon name="random"
                                               type="font-awesome"
                                               size={22}
@@ -208,25 +252,40 @@ class Playlist extends Component {
                             }
                             {
                                 this.state.isTrack === true &&
+                                    <View style={styles.buttonRowStyle}>
+                                        <TouchableHighlight style={styles.button} onPress={this.back} underlayColor="#fff" >
+                                            <Icon name="md-arrow-back"
+                                                  type="ionicon"
+                                                  size={24}
+                                                  color={'#000'}
+                                            />
+                                        </TouchableHighlight>
+                                    </View>
+                            }
+                            {
+                                this.state.isTrack === false &&
                                 <View style={styles.buttonRowStyle}>
-                                    <TouchableHighlight style={styles.button} onPress={this.back} underlayColor="#fff" >
-                                        <Icon name="md-arrow-back"
+                                    <TouchableHighlight style={styles.button} onPress={() => this.play(null)} underlayColor="#fff" >
+                                        <Icon name="ios-play"
                                               type="ionicon"
-                                              size={24}
+                                              size={30}
                                               color={'#000'}
                                         />
                                     </TouchableHighlight>
                                 </View>
                             }
-                            <View style={styles.buttonRowStyle}>
-                                <TouchableHighlight style={styles.button} onPress={() => this.play(null)} underlayColor="#fff" >
-                                    <Icon name="ios-play"
-                                          type="ionicon"
-                                          size={30}
-                                          color={'#000'}
-                                    />
-                                </TouchableHighlight>
-                            </View>
+                            {
+                                this.state.isTrack === true &&
+                                <View style={styles.buttonRowStyle}>
+                                    <TouchableHighlight style={styles.button} onPress={() => this.play(this.state.indexTrack)} underlayColor="#fff" >
+                                        <Icon name="ios-play"
+                                              type="ionicon"
+                                              size={30}
+                                              color={'#000'}
+                                        />
+                                    </TouchableHighlight>
+                                </View>
+                            }
                             <View style={styles.buttonRowStyle}>
                                 <TouchableHighlight style={styles.button} underlayColor="#fff" >
                                     <Icon name="ios-heart-empty"
@@ -251,7 +310,7 @@ class Playlist extends Component {
                                 this.state.isTrack === false &&
                                 this.props.tracks.length !== 0 &&
                                 this.props.tracks.map((l, i) => (
-                                    <TouchableHighlight onPress={() => this.play(i)} onLongPress={this.onPressLong.bind(this, l)} style={{height: 40, justifyContent: 'center'}} underlayColor="#fff">
+                                    <TouchableHighlight onPress={() => this.play(i)} onLongPress={this.onPressLong.bind(this, i, l)} style={{height: 40, justifyContent: 'center'}} underlayColor="#fff">
                                         <View style={styles.listTrack}>
                                             <View style={styles.rowIconOrNumberStyle}>
                                                 <Text style={styles.textNumber}>{l.id}</Text>
@@ -467,7 +526,7 @@ const styles = StyleSheet.create({
 });
 
 export default connect(
-    state => ({isPlay: state.player, edition: state.edition}),
+    state => ({isPlay: state.player, edition: state.edition, random: state.random}),
     dispatch => ({
         onPressPlayButton: () => {
             dispatch(playPlayer());
@@ -478,8 +537,14 @@ export default connect(
         onAddTrackQueue: (track) => {
             dispatch(addTrackQueue(track));
         },
+        onAddTrackQueueRandom: (track) => {
+            dispatch(addTrackQueueRandom(track));
+        },
         onAddEditionQueue: (edition) => {
             dispatch(addEditionQueue(edition));
+        },
+        onAddEditionQueueRandom: (edition) => {
+            dispatch(addEditionQueueRandom(edition));
         },
         onCreatePrevious: (tracks) => {
             dispatch(createPrevious(tracks));
@@ -489,6 +554,15 @@ export default connect(
         },
         onCreateQueue: (tracks) => {
             dispatch(createQueue(tracks));
+        },
+        onCreateQueueRandom: (tracks) => {
+            dispatch(createQueueRandom(tracks));
+        },
+        onCreateCommonMusic: () => {
+            dispatch(createCommonMusic());
+        },
+        onCreateRandomMusic: () => {
+            dispatch(createRandomMusic());
         }
     })
 )(Playlist)

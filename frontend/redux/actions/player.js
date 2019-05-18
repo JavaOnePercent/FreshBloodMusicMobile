@@ -85,7 +85,7 @@ export const deleteTrackPrevious = () => dispatch => {
 };
 
 export const createPreviousRandom = (tracks) => dispatch => {
-    dispatch({type: PLAYER_CREATE_PREVIOUS_RANDOM, payload: shuffleListTrack(tracks)});
+    dispatch({type: PLAYER_CREATE_PREVIOUS_RANDOM, payload: tracks});
 };
 
 export const addTrackPreviousRandom = (track) => dispatch => {
@@ -128,7 +128,7 @@ export const removeTrackQueue = (track) => dispatch => {
 };
 
 export const createQueueRandom = (tracks) => dispatch => {
-    dispatch({type: PLAYER_CREATE_QUEUE_RANDOM, payload: shuffleListTrack(tracks)});
+    dispatch({type: PLAYER_CREATE_QUEUE_RANDOM, payload: tracks});
 };
 
 export const addTrackQueueRandom = (track) => dispatch => {
@@ -154,7 +154,7 @@ export const removeTrackQueueRandom = (track) => dispatch => {
     dispatch({type: PLAYER_REMOVE_QUEUE_RANDOM, payload: track});
 };
 
-function shuffleListTrack(listTrack) {
+export const shuffleListTrack = (listTrack) => {
     let ctr = listTrack.length, temp, index;
 
     while (ctr > 0)

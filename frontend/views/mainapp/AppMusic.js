@@ -8,8 +8,11 @@ import MiniPlayer from "../../components/player/MiniPlayer";
 import FullPlayer from "../../components/player/FullPlayer";
 
 import Sound from 'react-native-sound';
-import {playPlayer, pausePlayer, addTrackPrevious, addBeginQueue, addCurrent, deleteTrackPrevious, deleteTrackQueue} from "../../redux/actions/player";
-import PropTypes from "prop-types";
+import {
+    playPlayer, pausePlayer, addTrackPrevious, addTrackPreviousRandom, addBeginQueue, addBeginQueueRandom, addCurrent,
+    deleteTrackPrevious, deleteTrackPreviousRandom, deleteTrackQueue, deleteTrackQueueRandom, createCommonMusic,
+    createRandomMusic, createPrevious, createPreviousRandom, createQueueRandom, createQueue, shuffleListTrack
+} from "../../redux/actions/player";
 
 class AppMusic extends React.Component {
 
@@ -29,6 +32,7 @@ class AppMusic extends React.Component {
         this.stop = this.stop.bind(this)
         this.prev = this.prev.bind(this)
         this.next = this.next.bind(this)
+        this.random = this.random.bind(this)
     }
 
     componentDidMount()
@@ -48,15 +52,23 @@ class AppMusic extends React.Component {
             {
                 this.pause();
             }
-            else if(this.props.isPlay !== '')
+            else
             {
                 if(this.sound !== undefined)
                 {
                     this.sound.release();
                 }
                 this.play({audio: this.props.isPlay});
-                this.props.onAddCurrent(this.props.queue[0]);
-                this.props.onDeleteTrackQueue();
+                if(this.props.random)
+                {
+                    this.props.onAddCurrent(this.props.queueRandom[0]);
+                    this.props.onDeleteTrackQueueRandom();
+                }
+                else
+                {
+                    this.props.onAddCurrent(this.props.queue[0]);
+                    this.props.onDeleteTrackQueue();
+                }
             }
         }
     }
@@ -111,16 +123,33 @@ class AppMusic extends React.Component {
 
     play(track)
     {
-        if(this.props.queue.length !== 0 && track === null && this.sound === undefined)
+        if(this.props.random)
         {
-            track = this.props.queue[0]
-            this.props.onAddCurrent(track)
-            this.props.onDeleteTrackQueue()
-        }
-        else if(this.props.queue.length === 0 && track === null && this.sound === undefined)
-        {
-            ToastAndroid.show('Найди сначала музыку для плеера', ToastAndroid.SHORT);
+            if(this.props.queueRandom.length !== 0 && track === null && this.sound === undefined)
+            {
+                track = this.props.queueRandom[0]
+                this.props.onAddCurrent(track)
+                this.props.onDeleteTrackQueueRandom()
+            }
+            else if(this.props.queueRandom.length === 0 && track === null && this.sound === undefined)
+            {
+                ToastAndroid.show('Найди сначала музыку для плеера', ToastAndroid.SHORT);
 
+            }
+        }
+        else
+        {
+            if(this.props.queue.length !== 0 && track === null && this.sound === undefined)
+            {
+                track = this.props.queue[0]
+                this.props.onAddCurrent(track)
+                this.props.onDeleteTrackQueue()
+            }
+            else if(this.props.queue.length === 0 && track === null && this.sound === undefined)
+            {
+                ToastAndroid.show('Найди сначала музыку для плеера', ToastAndroid.SHORT);
+
+            }
         }
         if(track !== null)
         {
@@ -131,14 +160,29 @@ class AppMusic extends React.Component {
                     this.sound.play((success) => {
                         if (success)
                         {
-                            if(this.props.queue.length > 0)
+                            if(this.props.random)
                             {
-                                ToastAndroid.show('Success', ToastAndroid.SHORT);
-                                this.sound.release();
-                                this.play(this.props.queue[0]);
-                                this.props.onAddTrackPrevious(this.props.current)
-                                this.props.onAddCurrent(this.props.queue[0])
-                                this.props.onDeleteTrackQueue()
+                                if(this.props.queueRandom.length > 0)
+                                {
+                                    this.sound.release();
+                                    this.play(this.props.queueRandom[0]);
+                                    this.props.onAddTrackPreviousRandom(this.props.current)
+                                    this.props.onAddCurrent(this.props.queueRandom[0])
+                                    this.props.onDeleteTrackQueueRandom()
+                                    this.props.onPressPlayButton()
+                                }
+                            }
+                            else
+                            {
+                                if(this.props.queue.length > 0)
+                                {
+                                    this.sound.release();
+                                    this.play(this.props.queue[0]);
+                                    this.props.onAddTrackPrevious(this.props.current)
+                                    this.props.onAddCurrent(this.props.queue[0])
+                                    this.props.onDeleteTrackQueue()
+                                    this.props.onPressPlayButton()
+                                }
                             }
                         }
                         else {
@@ -152,14 +196,29 @@ class AppMusic extends React.Component {
         {
             this.sound.play((success) => {
                 if (success) {
-                    if(this.props.queue.length > 0)
+                    if(this.props.random)
                     {
-                        ToastAndroid.show('Success', ToastAndroid.SHORT);
-                        this.sound.release();
-                        this.play(this.props.queue[0]);
-                        this.props.onAddTrackPrevious(this.props.current)
-                        this.props.onAddCurrent(this.props.queue[0])
-                        this.props.onDeleteTrackQueue()
+                        if(this.props.queueRandom.length > 0)
+                        {
+                            this.sound.release();
+                            this.play(this.props.queueRandom[0]);
+                            this.props.onAddTrackPreviousRandom(this.props.current)
+                            this.props.onAddCurrent(this.props.queueRandom[0])
+                            this.props.onDeleteTrackQueueRandom()
+                            this.props.onPressPlayButton()
+                        }
+                    }
+                    else
+                    {
+                        if(this.props.queue.length > 0)
+                        {
+                            this.sound.release();
+                            this.play(this.props.queue[0]);
+                            this.props.onAddTrackPrevious(this.props.current)
+                            this.props.onAddCurrent(this.props.queue[0])
+                            this.props.onDeleteTrackQueue()
+                            this.props.onPressPlayButton()
+                        }
                     }
                 } else {
                     ToastAndroid.show('Error', ToastAndroid.SHORT);
@@ -175,33 +234,130 @@ class AppMusic extends React.Component {
 
     prev()
     {
-        if(this.props.previous.length > 0)
+        if(this.props.random)
         {
-            this.sound.release();
-            this.play(this.props.previous[this.props.previous.length - 1]);
-            this.props.onAddBeginQueue(this.props.current)
-            this.props.onAddCurrent(this.props.previous[this.props.previous.length - 1])
-            this.props.onDeleteTrackPrevious()
-            this.props.onPressPlayButton()
+            if(this.props.previousRandom.length > 0)
+            {
+                this.sound.release();
+                this.play(this.props.previousRandom[this.props.previousRandom.length - 1]);
+                this.props.onAddBeginQueueRandom(this.props.current)
+                this.props.onAddCurrent(this.props.previousRandom[this.props.previousRandom.length - 1])
+                this.props.onDeleteTrackPreviousRandom()
+                this.props.onPressPlayButton()
+            }
+        }
+        else
+        {
+            if(this.props.previous.length > 0)
+            {
+                this.sound.release();
+                this.play(this.props.previous[this.props.previous.length - 1]);
+                this.props.onAddBeginQueue(this.props.current)
+                this.props.onAddCurrent(this.props.previous[this.props.previous.length - 1])
+                this.props.onDeleteTrackPrevious()
+                this.props.onPressPlayButton()
+            }
         }
     }
 
     next()
     {
-        if(this.props.queue.length > 0)
+        if(this.props.random)
         {
-            this.sound.release();
-            this.play(this.props.queue[0]);
-            this.props.onAddTrackPrevious(this.props.current)
-            this.props.onAddCurrent(this.props.queue[0])
-            this.props.onDeleteTrackQueue()
-            this.props.onPressPlayButton()
+            if(this.props.queueRandom.length > 0)
+            {
+                this.sound.release();
+                this.play(this.props.queueRandom[0]);
+                this.props.onAddTrackPreviousRandom(this.props.current)
+                this.props.onAddCurrent(this.props.queueRandom[0])
+                this.props.onDeleteTrackQueueRandom()
+                this.props.onPressPlayButton()
+            }
+        }
+        else
+        {
+            if(this.props.queue.length > 0)
+            {
+                this.sound.release();
+                this.play(this.props.queue[0]);
+                this.props.onAddTrackPrevious(this.props.current)
+                this.props.onAddCurrent(this.props.queue[0])
+                this.props.onDeleteTrackQueue()
+                this.props.onPressPlayButton()
+            }
         }
     }
 
+    random()
+    {
+        if(this.props.random)
+        {
+            this.props.onCreateCommonMusic();
+            if(this.props.current.id !== undefined)
+            {
+                let trackList = this.props.queue
+                let prev = []
+                let queue = []
+                let isCurrent = false
+                trackList.map((l, i) => {
+                    if (l.id === this.props.current.id && !isCurrent)
+                    {
+                        isCurrent = true
+                    }
+                    if (!isCurrent && l.id !== this.props.current.id)
+                    {
+                        prev.push(l)
+                    }
+                    else if (isCurrent && l.id !== this.props.current.id)
+                    {
+                        queue.push(l)
+                    }
+                })
+                this.props.onCreatePrevious(prev)
+                this.props.onCreateQueue(queue)
+            }
+        }
+        else {
+            this.props.onCreateRandomMusic();
+            if (this.props.current.id !== undefined)
+            {
+                let list = this.props.previous.concat(this.props.current, this.props.queue)
+                let trackList = this.props.previous.concat(this.props.current, this.props.queue)
+                this.props.onCreateQueue(list)
+                let trackListRandom = shuffleListTrack(trackList);
+                let prevRandom = []
+                let queueRandom = []
+                let isCurrent = false
+                trackListRandom.map((l, i) => {
+                    if (l.id === this.props.current.id && !isCurrent)
+                    {
+                        isCurrent = true
+                    }
+                    if (!isCurrent && l.id !== this.props.current.id)
+                    {
+                        prevRandom.push(l)
+                    }
+                    else if (isCurrent && l.id !== this.props.current.id)
+                    {
+                        queueRandom.push(l)
+                    }
+                })
+                // this.props.onCreateQueue(trackList)
+                this.props.onCreatePreviousRandom(prevRandom)
+                this.props.onCreateQueueRandom(queueRandom)
+
+                // let randomPrevious = shuffleListTrack(this.props.previous);
+                // let randomQueue = shuffleListTrack(this.props.queue);
+                // this.props.onCreatePreviousRandom(randomPrevious);
+                // this.props.onCreateQueueRandom(randomQueue);
+            }
+        }
+    }
+
+
     render() {
 
-        const { current, queue } = this.props;
+        const { current, queue, queueRandom } = this.props;
 
         return (
             <Provider store={store}>
@@ -230,7 +386,10 @@ class AppMusic extends React.Component {
                                 nextTrack={this.next}
                                 sound={this.sound}
                                 isPlay={this.props.isPlay}
-                                playlist={queue}/>
+                                isRandom={this.props.random}
+                                random={this.random}
+                                queue={queue}
+                                queueRandom={queueRandom}/>
                         </View>
                     }
                 </View>
@@ -256,7 +415,8 @@ const styles = StyleSheet.create({
 });
 
 export default connect(
-    state => ({isPlay: state.player, previous: state.previous, current: state.current, queue: state.queue}),
+    state => ({isPlay: state.player, previous: state.previous, previousRandom: state.previousRandom,
+        current: state.current, queue: state.queue, queueRandom: state.queueRandom, random: state.random}),
     dispatch => ({
         onPressPlayButton: () => {
             dispatch(playPlayer());
@@ -267,8 +427,14 @@ export default connect(
         onAddTrackPrevious: (track) => {
             dispatch(addTrackPrevious(track));
         },
+        onAddTrackPreviousRandom: (track) => {
+            dispatch(addTrackPreviousRandom(track));
+        },
         onAddBeginQueue: (track) => {
             dispatch(addBeginQueue(track));
+        },
+        onAddBeginQueueRandom: (track) => {
+            dispatch(addBeginQueueRandom(track));
         },
         onAddCurrent: (track) => {
             dispatch(addCurrent(track));
@@ -276,8 +442,32 @@ export default connect(
         onDeleteTrackPrevious: () => {
             dispatch(deleteTrackPrevious());
         },
+        onDeleteTrackPreviousRandom: () => {
+            dispatch(deleteTrackPreviousRandom());
+        },
         onDeleteTrackQueue: () => {
             dispatch(deleteTrackQueue());
+        },
+        onDeleteTrackQueueRandom: () => {
+            dispatch(deleteTrackQueueRandom());
+        },
+        onCreateCommonMusic: () => {
+            dispatch(createCommonMusic());
+        },
+        onCreateRandomMusic: () => {
+            dispatch(createRandomMusic());
+        },
+        onCreatePrevious: (tracks) => {
+            dispatch(createPrevious(tracks));
+        },
+        onCreateQueue: (tracks) => {
+            dispatch(createQueue(tracks));
+        },
+        onCreatePreviousRandom: (tracks) => {
+            dispatch(createPreviousRandom(tracks));
+        },
+        onCreateQueueRandom: (tracks) => {
+            dispatch(createQueueRandom(tracks));
         }
     })
 )(AppMusic)

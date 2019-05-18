@@ -45,7 +45,10 @@ class FullPlayer extends Component {
         sound: PropTypes.object.isRequired,
         closePlayer: PropTypes.func.isRequired,
         isPlay: PropTypes.string.isRequired,
-        playlist: PropTypes.array.isRequired
+        isRandom: PropTypes.bool.isRequired,
+        random: PropTypes.func.isRequired,
+        queue: PropTypes.array.isRequired,
+        queueRandom: PropTypes.array.isRequired
     }
 
     componentDidMount()
@@ -150,7 +153,7 @@ class FullPlayer extends Component {
 
     onRandomButton()
     {
-        this.setState({buttonRandom: !this.state.buttonRandom});
+        this.props.random()
     }
 
     onRepeatButton()
@@ -214,7 +217,7 @@ class FullPlayer extends Component {
         const currentTimeString = FullPlayer.getAudioTimeString(this.state.playSeconds);
         const durationString = FullPlayer.getAudioTimeString(this.state.showDuration);
 
-        const { iconAlbum, namePerformer, nameTrack, prevTrack, nextTrack, closePlayer, playlist } = this.props;
+        const { iconAlbum, namePerformer, nameTrack, prevTrack, nextTrack, closePlayer, queue, queueRandom } = this.props;
         return (
             <Provider store={store}>
                 <View style={styles.container}>
@@ -368,11 +371,21 @@ class FullPlayer extends Component {
                             <View style={styles.queue}>
                                 <Text style={styles.queueText}>Далее</Text>
                                 {
-                                    this.props.playlist.length !== 0 && this.props.playlist &&
+                                    !this.props.isRandom && this.props.queue.length !== 0 && this.props.queue &&
                                     <SortableList
                                         style={styles.list}
                                         contentContainerStyle={styles.queueList}
-                                        data={playlist}
+                                        data={queue}
+                                        showsVerticalScrollIndicator={false}
+                                        onPressRow={(key) => {ToastAndroid.show(key, ToastAndroid.SHORT)}}
+                                        renderRow={this._renderRow} />
+                                }
+                                {
+                                    this.props.isRandom && this.props.queueRandom.length !== 0 && this.props.queueRandom &&
+                                    <SortableList
+                                        style={styles.list}
+                                        contentContainerStyle={styles.queueList}
+                                        data={queueRandom}
                                         showsVerticalScrollIndicator={false}
                                         onPressRow={(key) => {ToastAndroid.show(key, ToastAndroid.SHORT)}}
                                         renderRow={this._renderRow} />
@@ -384,7 +397,7 @@ class FullPlayer extends Component {
                             {translateX: 0},
                             {translateY: Dimensions.get('window').height - 75}]}}>
                         <View style={{flexDirection:'row'}}>
-                            {this.state.buttonRandom === false &&
+                            {this.props.isRandom === false &&
                                 <View style={{marginRight: Dimensions.get('window').width - 250}}>
                                     <TouchableHighlight style={styles.button} underlayColor="#fff"
                                                         onPress={this.onRandomButton}>
@@ -396,7 +409,7 @@ class FullPlayer extends Component {
                                     </TouchableHighlight>
                                 </View>
                             }
-                            {this.state.buttonRandom === true &&
+                            {this.props.isRandom === true &&
                                 <View style={{marginRight: Dimensions.get('window').width - 250}}>
                                     <TouchableHighlight style={styles.button} underlayColor="#fff"
                                                         onPress={this.onRandomButton}>
