@@ -12,9 +12,6 @@ import {
     PLAYER_CREATE_PREVIOUS,
     PLAYER_ADD_TRACK_PREVIOUS,
     PLAYER_DELETE_PREVIOUS,
-    PLAYER_CREATE_PREVIOUS_RANDOM,
-    PLAYER_ADD_TRACK_PREVIOUS_RANDOM,
-    PLAYER_DELETE_PREVIOUS_RANDOM,
     PLAYER_ADD_CURRENT_TRACK,
     PLAYER_CREATE_QUEUE,
     PLAYER_ADD_TRACK_QUEUE,
@@ -23,13 +20,11 @@ import {
     PLAYER_CHANGE_QUEUE,
     PLAYER_DELETE_QUEUE,
     PLAYER_REMOVE_QUEUE,
-    PLAYER_CREATE_QUEUE_RANDOM,
-    PLAYER_ADD_EDITION_QUEUE_RANDOM,
-    PLAYER_ADD_TRACK_QUEUE_RANDOM,
-    PLAYER_ADD_BEGIN_QUEUE_RANDOM,
-    PLAYER_CHANGE_QUEUE_RANDOM,
-    PLAYER_DELETE_QUEUE_RANDOM,
-    PLAYER_REMOVE_QUEUE_RANDOM
+    PLAYER_CREATE_PLAYLIST,
+    PLAYER_ADD_EDITION_PLAYLIST,
+    PLAYER_ADD_TRACK_PLAYLIST,
+    PLAYER_REMOVE_PLAYLIST,
+    PLAYER_CLEAR_PLAYLIST
 } from '../actions/types';
 import React from 'react';
 import {ToastAndroid} from 'react-native';
@@ -113,23 +108,6 @@ export function previous (state = [], action) {
     }
 }
 
-export function previousRandom (state = [], action) {
-    switch(action.type)
-    {
-        case PLAYER_CREATE_PREVIOUS_RANDOM:
-            ToastAndroid.show(PLAYER_CREATE_PREVIOUS_RANDOM, ToastAndroid.SHORT);
-            return action.payload;
-        case PLAYER_ADD_TRACK_PREVIOUS_RANDOM:
-            ToastAndroid.show(PLAYER_ADD_TRACK_PREVIOUS_RANDOM, ToastAndroid.SHORT);
-            return [...state, action.payload];
-        case PLAYER_DELETE_PREVIOUS_RANDOM:
-            ToastAndroid.show(PLAYER_DELETE_PREVIOUS_RANDOM, ToastAndroid.SHORT);
-            return state.slice(0, state.length - 1);
-        default:
-            return state;
-    }
-}
-
 export function current (state = {}, action) {
     switch(action.type)
     {
@@ -177,17 +155,17 @@ export function queue (state = [], action) {
     }
 }
 
-export function queueRandom (state = [], action) {
+export function playlist (state = [], action) {
     switch(action.type)
     {
-        case PLAYER_CREATE_QUEUE_RANDOM:
-            ToastAndroid.show(PLAYER_CREATE_QUEUE_RANDOM, ToastAndroid.SHORT);
+        case PLAYER_CREATE_PLAYLIST:
+            ToastAndroid.show(PLAYER_CREATE_PLAYLIST, ToastAndroid.SHORT);
             return action.payload;
-        case PLAYER_ADD_TRACK_QUEUE_RANDOM:
-            ToastAndroid.show(PLAYER_ADD_TRACK_QUEUE_RANDOM, ToastAndroid.SHORT);
+        case PLAYER_ADD_TRACK_PLAYLIST:
+            ToastAndroid.show(PLAYER_ADD_TRACK_PLAYLIST, ToastAndroid.SHORT);
             return [...state, action.payload];
-        case PLAYER_ADD_EDITION_QUEUE_RANDOM:
-            ToastAndroid.show(PLAYER_ADD_EDITION_QUEUE_RANDOM, ToastAndroid.SHORT);
+        case PLAYER_ADD_EDITION_PLAYLIST:
+            ToastAndroid.show(PLAYER_ADD_EDITION_PLAYLIST, ToastAndroid.SHORT);
             if(state.length === 0 || !state)
             {
                 return action.payload;
@@ -196,18 +174,12 @@ export function queueRandom (state = [], action) {
             {
                 return [...state.concat(action.payload)];
             }
-        case PLAYER_ADD_BEGIN_QUEUE_RANDOM:
-            ToastAndroid.show(PLAYER_ADD_BEGIN_QUEUE_RANDOM, ToastAndroid.SHORT);
-            return [action.payload, ...state];
-        case PLAYER_CHANGE_QUEUE_RANDOM:
-            ToastAndroid.show(PLAYER_CHANGE_QUEUE_RANDOM, ToastAndroid.SHORT);
-            return action.payload;
-        case PLAYER_DELETE_QUEUE_RANDOM:
-            ToastAndroid.show(PLAYER_DELETE_QUEUE_RANDOM, ToastAndroid.SHORT);
-            return state.slice(1);
-        case PLAYER_REMOVE_QUEUE_RANDOM:
-            ToastAndroid.show(PLAYER_REMOVE_QUEUE_RANDOM, ToastAndroid.SHORT);
+        case PLAYER_REMOVE_PLAYLIST:
+            ToastAndroid.show(PLAYER_REMOVE_PLAYLIST, ToastAndroid.SHORT);
             return state.filter(({ id }) => id !== action.payload);
+        case PLAYER_CLEAR_PLAYLIST:
+            ToastAndroid.show(PLAYER_CLEAR_PLAYLIST, ToastAndroid.SHORT);
+            return [];
         default:
             return state;
     }

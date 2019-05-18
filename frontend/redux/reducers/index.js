@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 
-import { player, random, repeat, playerLike, previous, previousRandom, current, queue, queueRandom } from './playerReducer';
+import { player, random, repeat, playerLike, previous, current, queue, playlist } from './playerReducer';
 import { news, edition } from './newsReducer';
 
 export default combineReducers({
@@ -9,10 +9,9 @@ export default combineReducers({
     repeat,
     playerLike,
     previous,
-    previousRandom,
     current,
     queue,
-    queueRandom,
+    playlist,
     news,
     edition
 });

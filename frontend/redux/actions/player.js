@@ -12,9 +12,6 @@ import {
     PLAYER_CREATE_PREVIOUS,
     PLAYER_ADD_TRACK_PREVIOUS,
     PLAYER_DELETE_PREVIOUS,
-    PLAYER_CREATE_PREVIOUS_RANDOM,
-    PLAYER_ADD_TRACK_PREVIOUS_RANDOM,
-    PLAYER_DELETE_PREVIOUS_RANDOM,
     PLAYER_ADD_CURRENT_TRACK,
     PLAYER_CREATE_QUEUE,
     PLAYER_ADD_TRACK_QUEUE,
@@ -23,13 +20,11 @@ import {
     PLAYER_CHANGE_QUEUE,
     PLAYER_DELETE_QUEUE,
     PLAYER_REMOVE_QUEUE,
-    PLAYER_CREATE_QUEUE_RANDOM,
-    PLAYER_ADD_EDITION_QUEUE_RANDOM,
-    PLAYER_ADD_TRACK_QUEUE_RANDOM,
-    PLAYER_ADD_BEGIN_QUEUE_RANDOM,
-    PLAYER_CHANGE_QUEUE_RANDOM,
-    PLAYER_DELETE_QUEUE_RANDOM,
-    PLAYER_REMOVE_QUEUE_RANDOM
+    PLAYER_CREATE_PLAYLIST,
+    PLAYER_ADD_EDITION_PLAYLIST,
+    PLAYER_ADD_TRACK_PLAYLIST,
+    PLAYER_REMOVE_PLAYLIST,
+    PLAYER_CLEAR_PLAYLIST
 } from '../actions/types';
 
 export const playPlayer = () => dispatch => {
@@ -84,18 +79,6 @@ export const deleteTrackPrevious = () => dispatch => {
     dispatch({type: PLAYER_DELETE_PREVIOUS});
 };
 
-export const createPreviousRandom = (tracks) => dispatch => {
-    dispatch({type: PLAYER_CREATE_PREVIOUS_RANDOM, payload: tracks});
-};
-
-export const addTrackPreviousRandom = (track) => dispatch => {
-    dispatch({type: PLAYER_ADD_TRACK_PREVIOUS_RANDOM, payload: track});
-};
-
-export const deleteTrackPreviousRandom = () => dispatch => {
-    dispatch({type: PLAYER_DELETE_PREVIOUS_RANDOM});
-};
-
 export const addCurrent = (track) => dispatch => {
     dispatch({type: PLAYER_ADD_CURRENT_TRACK, payload: track});
 };
@@ -127,33 +110,25 @@ export const removeTrackQueue = (track) => dispatch => {
     dispatch({type: PLAYER_REMOVE_QUEUE, payload: track});
 };
 
-export const createQueueRandom = (tracks) => dispatch => {
-    dispatch({type: PLAYER_CREATE_QUEUE_RANDOM, payload: tracks});
+export const createPlaylist = (tracks) => dispatch => {
+    dispatch({type: PLAYER_CREATE_PLAYLIST, payload: tracks});
 };
 
-export const addTrackQueueRandom = (track) => dispatch => {
-    dispatch({type: PLAYER_ADD_TRACK_QUEUE_RANDOM, payload: track});
+export const addTrackPlaylist = (track) => dispatch => {
+    dispatch({type: PLAYER_ADD_TRACK_PLAYLIST, payload: track});
 };
 
-export const addEditionQueueRandom = (edition) => dispatch => {
-    dispatch({type: PLAYER_ADD_EDITION_QUEUE_RANDOM, payload: edition});
+export const addEditionPlaylist = (edition) => dispatch => {
+    dispatch({type: PLAYER_ADD_EDITION_PLAYLIST, payload: edition});
 };
 
-export const addBeginQueueRandom = (track) => dispatch => {
-    dispatch({type: PLAYER_ADD_BEGIN_QUEUE_RANDOM, payload: track});
-};
-export const changeOrderQueueRandom = (tracks) => dispatch => {
-    dispatch({type: PLAYER_CHANGE_QUEUE_RANDOM, payload: tracks});
+export const removeTrackPlaylist = (track) => dispatch => {
+    dispatch({type: PLAYER_REMOVE_PLAYLIST, payload: track});
 };
 
-export const deleteTrackQueueRandom = () => dispatch => {
-    dispatch({type: PLAYER_DELETE_QUEUE_RANDOM});
+export const clearTrackPlaylist = () => dispatch => {
+    dispatch({type: PLAYER_CLEAR_PLAYLIST});
 };
-
-export const removeTrackQueueRandom = (track) => dispatch => {
-    dispatch({type: PLAYER_REMOVE_QUEUE_RANDOM, payload: track});
-};
-
 export const shuffleListTrack = (listTrack) => {
     let ctr = listTrack.length, temp, index;
 

@@ -47,8 +47,7 @@ class FullPlayer extends Component {
         isPlay: PropTypes.string.isRequired,
         isRandom: PropTypes.bool.isRequired,
         random: PropTypes.func.isRequired,
-        queue: PropTypes.array.isRequired,
-        queueRandom: PropTypes.array.isRequired
+        queue: PropTypes.array.isRequired
     }
 
     componentDidMount()
@@ -217,7 +216,7 @@ class FullPlayer extends Component {
         const currentTimeString = FullPlayer.getAudioTimeString(this.state.playSeconds);
         const durationString = FullPlayer.getAudioTimeString(this.state.showDuration);
 
-        const { iconAlbum, namePerformer, nameTrack, prevTrack, nextTrack, closePlayer, queue, queueRandom } = this.props;
+        const { iconAlbum, namePerformer, nameTrack, prevTrack, nextTrack, closePlayer, queue } = this.props;
         return (
             <Provider store={store}>
                 <View style={styles.container}>
@@ -371,21 +370,11 @@ class FullPlayer extends Component {
                             <View style={styles.queue}>
                                 <Text style={styles.queueText}>Далее</Text>
                                 {
-                                    !this.props.isRandom && this.props.queue.length !== 0 && this.props.queue &&
+                                    this.props.queue.length !== 0 && this.props.queue &&
                                     <SortableList
                                         style={styles.list}
                                         contentContainerStyle={styles.queueList}
                                         data={queue}
-                                        showsVerticalScrollIndicator={false}
-                                        onPressRow={(key) => {ToastAndroid.show(key, ToastAndroid.SHORT)}}
-                                        renderRow={this._renderRow} />
-                                }
-                                {
-                                    this.props.isRandom && this.props.queueRandom.length !== 0 && this.props.queueRandom &&
-                                    <SortableList
-                                        style={styles.list}
-                                        contentContainerStyle={styles.queueList}
-                                        data={queueRandom}
                                         showsVerticalScrollIndicator={false}
                                         onPressRow={(key) => {ToastAndroid.show(key, ToastAndroid.SHORT)}}
                                         renderRow={this._renderRow} />

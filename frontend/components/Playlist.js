@@ -14,18 +14,18 @@ import { Provider, connect } from 'react-redux';
 import store from "../redux/store";
 import {
     addEditionQueue,
-    addEditionQueueRandom,
     addTrackQueue,
-    addTrackQueueRandom,
     playPlayer,
     releasePlayer,
     createPrevious,
     addCurrent,
     createQueue,
     createCommonMusic,
-    createQueueRandom,
     createRandomMusic,
     shuffleListTrack,
+    createPlaylist,
+    addTrackPlaylist,
+    addEditionPlaylist
 } from "../redux/actions/player";
 
 class Playlist extends Component {
@@ -95,12 +95,9 @@ class Playlist extends Component {
             this.props.onAddTrackQueue({id: this.state.idTrack, performer: this.props.namePerformer, cover: this.props.iconAlbum,
                 title: this.state.titleTrack, audio: this.state.audioTrack, duration: this.state.durationTrack,
                 isLiked: this.state.isLikedTrack})
-            if(this.props.random)
-            {
-                this.props.onAddTrackQueueRandom({id: this.state.idTrack, performer: this.props.namePerformer, cover: this.props.iconAlbum,
-                    title: this.state.titleTrack, audio: this.state.audioTrack, duration: this.state.durationTrack,
-                    isLiked: this.state.isLikedTrack})
-            }
+            this.props.onAddTrackPlaylist({id: this.state.idTrack, performer: this.props.namePerformer, cover: this.props.iconAlbum,
+                title: this.state.titleTrack, audio: this.state.audioTrack, duration: this.state.durationTrack,
+                isLiked: this.state.isLikedTrack})
         }
         else
         {
@@ -111,10 +108,7 @@ class Playlist extends Component {
                     isLiked: l.is_liked})
             ))
             this.props.onAddEditionQueue(edition)
-            if(this.props.random)
-            {
-                this.props.onAddEditionQueueRandom(edition)
-            }
+            this.props.onAddEditionPlaylist(edition)
         }
     }
 
@@ -138,6 +132,7 @@ class Playlist extends Component {
         {
             let prev = []
             let queue = []
+            let playlist = []
             this.props.edition.map((l, i) =>
                 {
                     if(i < index)
@@ -152,10 +147,14 @@ class Playlist extends Component {
                             title: l.name_trc, audio: l.audio_trc, duration: l.duration,
                             isLiked: l.is_liked})
                     }
+                    playlist.push({id: l.id, performer: this.props.namePerformer, cover: this.props.iconAlbum,
+                        title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                        isLiked: l.is_liked})
                 }
             )
             this.props.onCreatePrevious(prev)
             this.props.onCreateQueue(queue)
+            this.props.onCreatePlaylist(playlist)
             this.props.onPressReleasePlayButton(this.props.tracks[index].audio_trc);
         }
         else
@@ -167,6 +166,7 @@ class Playlist extends Component {
                     isLiked: l.is_liked})
             ))
             this.props.onCreateQueue(queue)
+            this.props.onCreatePlaylist(queue)
             this.props.onPressReleasePlayButton(this.props.tracks[0].audio_trc);
         }
     }
@@ -180,9 +180,9 @@ class Playlist extends Component {
                 title: l.name_trc, audio: l.audio_trc, duration: l.duration,
                 isLiked: l.is_liked})
         ))
-        let randomQueue = shuffleListTrack(queue);
-        this.props.onCreateQueue(queue);
-        this.props.onCreateQueueRandom(randomQueue);
+        this.props.onCreatePlaylist(queue);
+        let randomQueue = shuffleListTrack(queue.slice());
+        this.props.onCreateQueue(randomQueue);
         this.props.onPressReleasePlayButton(randomQueue[0].audio);
     }
 
@@ -537,14 +537,8 @@ export default connect(
         onAddTrackQueue: (track) => {
             dispatch(addTrackQueue(track));
         },
-        onAddTrackQueueRandom: (track) => {
-            dispatch(addTrackQueueRandom(track));
-        },
         onAddEditionQueue: (edition) => {
             dispatch(addEditionQueue(edition));
-        },
-        onAddEditionQueueRandom: (edition) => {
-            dispatch(addEditionQueueRandom(edition));
         },
         onCreatePrevious: (tracks) => {
             dispatch(createPrevious(tracks));
@@ -555,8 +549,14 @@ export default connect(
         onCreateQueue: (tracks) => {
             dispatch(createQueue(tracks));
         },
-        onCreateQueueRandom: (tracks) => {
-            dispatch(createQueueRandom(tracks));
+        onCreatePlaylist: (tracks) => {
+            dispatch(createPlaylist(tracks));
+        },
+        onAddTrackPlaylist: (track) => {
+            dispatch(addTrackPlaylist(track));
+        },
+        onAddEditionPlaylist: (edition) => {
+            dispatch(addEditionPlaylist(edition));
         },
         onCreateCommonMusic: () => {
             dispatch(createCommonMusic());
