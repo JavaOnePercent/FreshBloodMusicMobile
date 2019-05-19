@@ -2,6 +2,8 @@ import {
     PLAYER_PLAY_MUSIC,
     PLAYER_PAUSE_MUSIC,
     PLAYER_RELEASE_MUSIC,
+    PLAYER_LISTEN_MUSIC,
+    PLAYER_UNLISTEN_MUSIC,
     PLAYER_COMMON_MUSIC,
     PLAYER_RANDOM_MUSIC,
     PLAYER_UNREPEAT_MUSIC,
@@ -11,7 +13,9 @@ import {
     PLAYER_UNLIKE_MUSIC,
     PLAYER_CREATE_PREVIOUS,
     PLAYER_ADD_TRACK_PREVIOUS,
+    PLAYER_ADD_BEGIN_PREVIOUS,
     PLAYER_DELETE_PREVIOUS,
+    PLAYER_CLEAR_PREVIOUS,
     PLAYER_ADD_CURRENT_TRACK,
     PLAYER_CREATE_QUEUE,
     PLAYER_ADD_TRACK_QUEUE,
@@ -20,6 +24,7 @@ import {
     PLAYER_CHANGE_QUEUE,
     PLAYER_DELETE_QUEUE,
     PLAYER_REMOVE_QUEUE,
+    PLAYER_CLEAR_QUEUE,
     PLAYER_CREATE_PLAYLIST,
     PLAYER_ADD_EDITION_PLAYLIST,
     PLAYER_ADD_TRACK_PLAYLIST,
@@ -37,6 +42,14 @@ export const pausePlayer = () => dispatch => {
 
 export const releasePlayer = (audio) => dispatch => {
     dispatch({type: PLAYER_RELEASE_MUSIC, payload: audio});
+};
+
+export const listenPlayer = () => dispatch => {
+    dispatch({type: PLAYER_LISTEN_MUSIC});
+};
+
+export const unlistenPlayer = () => dispatch => {
+    dispatch({type: PLAYER_UNLISTEN_MUSIC});
 };
 
 export const createCommonMusic = () => dispatch => {
@@ -75,8 +88,16 @@ export const addTrackPrevious = (track) => dispatch => {
     dispatch({type: PLAYER_ADD_TRACK_PREVIOUS, payload: track});
 };
 
+export const addBeginPrevious = (track) => dispatch => {
+    dispatch({type: PLAYER_ADD_BEGIN_PREVIOUS, payload: track});
+}
+
 export const deleteTrackPrevious = () => dispatch => {
     dispatch({type: PLAYER_DELETE_PREVIOUS});
+};
+
+export const clearPrevious = () => dispatch => {
+    dispatch({type: PLAYER_CLEAR_PREVIOUS});
 };
 
 export const addCurrent = (track) => dispatch => {
@@ -108,6 +129,10 @@ export const deleteTrackQueue = () => dispatch => {
 
 export const removeTrackQueue = (track) => dispatch => {
     dispatch({type: PLAYER_REMOVE_QUEUE, payload: track});
+};
+
+export const clearQueue = () => dispatch => {
+    dispatch({type: PLAYER_CLEAR_QUEUE});
 };
 
 export const createPlaylist = (tracks) => dispatch => {

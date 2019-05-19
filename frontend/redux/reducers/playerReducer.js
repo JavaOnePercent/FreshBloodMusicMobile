@@ -2,6 +2,8 @@ import {
     PLAYER_PLAY_MUSIC,
     PLAYER_PAUSE_MUSIC,
     PLAYER_RELEASE_MUSIC,
+    PLAYER_LISTEN_MUSIC,
+    PLAYER_UNLISTEN_MUSIC,
     PLAYER_COMMON_MUSIC,
     PLAYER_RANDOM_MUSIC,
     PLAYER_UNREPEAT_MUSIC,
@@ -11,7 +13,9 @@ import {
     PLAYER_UNLIKE_MUSIC,
     PLAYER_CREATE_PREVIOUS,
     PLAYER_ADD_TRACK_PREVIOUS,
+    PLAYER_ADD_BEGIN_PREVIOUS,
     PLAYER_DELETE_PREVIOUS,
+    PLAYER_CLEAR_PREVIOUS,
     PLAYER_ADD_CURRENT_TRACK,
     PLAYER_CREATE_QUEUE,
     PLAYER_ADD_TRACK_QUEUE,
@@ -20,6 +24,7 @@ import {
     PLAYER_CHANGE_QUEUE,
     PLAYER_DELETE_QUEUE,
     PLAYER_REMOVE_QUEUE,
+    PLAYER_CLEAR_QUEUE,
     PLAYER_CREATE_PLAYLIST,
     PLAYER_ADD_EDITION_PLAYLIST,
     PLAYER_ADD_TRACK_PLAYLIST,
@@ -41,6 +46,20 @@ export function player (state = 'pause', action) {
         case PLAYER_RELEASE_MUSIC:
             ToastAndroid.show(PLAYER_RELEASE_MUSIC, ToastAndroid.SHORT);
             return action.payload;
+        default:
+            return state;
+    }
+}
+
+export function listen (state = false, action) {
+    switch(action.type)
+    {
+        case PLAYER_LISTEN_MUSIC:
+            ToastAndroid.show(PLAYER_LISTEN_MUSIC, ToastAndroid.SHORT);
+            return true;
+        case PLAYER_UNLISTEN_MUSIC:
+            ToastAndroid.show(PLAYER_UNLISTEN_MUSIC, ToastAndroid.SHORT);
+            return false;
         default:
             return state;
     }
@@ -100,9 +119,15 @@ export function previous (state = [], action) {
         case PLAYER_ADD_TRACK_PREVIOUS:
             ToastAndroid.show(PLAYER_ADD_TRACK_PREVIOUS, ToastAndroid.SHORT);
             return [...state, action.payload];
+        case PLAYER_ADD_BEGIN_PREVIOUS:
+            ToastAndroid.show(PLAYER_ADD_BEGIN_PREVIOUS, ToastAndroid.SHORT);
+            return [action.payload, ...state];
         case PLAYER_DELETE_PREVIOUS:
             ToastAndroid.show(PLAYER_DELETE_PREVIOUS, ToastAndroid.SHORT);
             return state.slice(0, state.length - 1);
+        case PLAYER_CLEAR_PREVIOUS:
+            ToastAndroid.show(PLAYER_CLEAR_PREVIOUS, ToastAndroid.SHORT);
+            return [];
         default:
             return state;
     }
@@ -150,6 +175,9 @@ export function queue (state = [], action) {
         case PLAYER_REMOVE_QUEUE:
             ToastAndroid.show(PLAYER_REMOVE_QUEUE, ToastAndroid.SHORT);
             return state.filter(({ id }) => id !== action.payload);
+        case PLAYER_CLEAR_QUEUE:
+            ToastAndroid.show(PLAYER_CLEAR_QUEUE, ToastAndroid.SHORT);
+            return [];
         default:
             return state;
     }

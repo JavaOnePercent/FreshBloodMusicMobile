@@ -16,6 +16,7 @@ import {
     addEditionQueue,
     addTrackQueue,
     playPlayer,
+    pausePlayer,
     releasePlayer,
     createPrevious,
     addCurrent,
@@ -25,7 +26,9 @@ import {
     shuffleListTrack,
     createPlaylist,
     addTrackPlaylist,
-    addEditionPlaylist
+    addEditionPlaylist,
+    listenPlayer,
+    unlistenPlayer
 } from "../redux/actions/player";
 
 class Playlist extends Component {
@@ -83,6 +86,7 @@ class Playlist extends Component {
             titleTrack: l.name_trc,
             audioTrack: l.audio_trc,
             durationTrack: l.duration,
+            ratingTrack: l.rating_trc,
             isLikedTrack: l.is_liked
 
         });
@@ -186,6 +190,22 @@ class Playlist extends Component {
         this.props.onPressReleasePlayButton(randomQueue[0].audio);
     }
 
+    playCurrent()
+    {
+        this.props.onPressPlayButton();
+    }
+
+    pauseCurrent()
+    {
+        setTimeout(() => {
+            if(this.props.listen === true)
+            {
+                this.props.onPressPauseButton()
+                this.props.onUnlistenPlayer()
+            }
+        }, 1000);
+    }
+
 
     render() {
 
@@ -222,17 +242,17 @@ class Playlist extends Component {
                                 {
                                     this.state.isTrack === false &&
                                     <View style={styles.columnStyle}>
-                                        <Text style={styles.titleTrack}>{nameAlbum}</Text>
-                                        <Text style={styles.titlePerformer}>{namePerformer}</Text>
-                                        <Text style={styles.titlePerformer}>{style + ' (' + year + ')'}</Text>
+                                        <Text numberOfLines={2} ellipsizeMode="tail" style={styles.titleTrack}>{nameAlbum}</Text>
+                                        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.titlePerformer}>{namePerformer}</Text>
+                                        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.titlePerformer}>{style + ' (' + year + ')'}</Text>
                                     </View>
                                 }
                                 {
                                     this.state.isTrack === true &&
                                     <View style={styles.columnStyle}>
-                                        <Text style={styles.titleTrack}>{this.state.titleTrack}</Text>
-                                        <Text style={styles.titlePerformer}>{namePerformer}</Text>
-                                        <Text style={styles.titlePerformer}>{nameAlbum}</Text>
+                                        <Text numberOfLines={2} ellipsizeMode="tail" style={styles.titleTrack}>{this.state.titleTrack}</Text>
+                                        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.titlePerformer}>{namePerformer}</Text>
+                                        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.titlePerformer}>{nameAlbum}</Text>
                                     </View>
                                 }
                             </View>
@@ -275,7 +295,7 @@ class Playlist extends Component {
                                 </View>
                             }
                             {
-                                this.state.isTrack === true &&
+                                this.state.isTrack === true && this.state.idTrack !== this.props.current.id &&
                                 <View style={styles.buttonRowStyle}>
                                     <TouchableHighlight style={styles.button} onPress={() => this.play(this.state.indexTrack)} underlayColor="#fff" >
                                         <Icon name="ios-play"
@@ -286,15 +306,52 @@ class Playlist extends Component {
                                     </TouchableHighlight>
                                 </View>
                             }
-                            <View style={styles.buttonRowStyle}>
-                                <TouchableHighlight style={styles.button} underlayColor="#fff" >
-                                    <Icon name="ios-heart-empty"
-                                          type="ionicon"
-                                          size={26}
-                                          color={'#000'}
-                                    />
-                                </TouchableHighlight>
-                            </View>
+                            {
+                                this.state.isTrack === true && this.state.idTrack === this.props.current.id && this.props.isPlay === 'pause' &&
+                                <View style={styles.buttonRowStyle}>
+                                    <TouchableHighlight style={styles.button} onPress={() => this.playCurrent()} underlayColor="#fff" >
+                                        <Icon name="ios-play"
+                                              type="ionicon"
+                                              size={30}
+                                              color={'#000'}
+                                        />
+                                    </TouchableHighlight>
+                                </View>
+                            }
+                            {
+                                this.state.isTrack === true && this.state.idTrack === this.props.current.id && this.props.isPlay !== 'pause' &&
+                                <View style={styles.buttonRowStyle}>
+                                    <TouchableHighlight style={styles.button} onPress={() => this.pauseCurrent()} underlayColor="#fff" >
+                                        <Icon name="ios-pause"
+                                              type="ionicon"
+                                              size={30}
+                                              color={'#000'}
+                                        />
+                                    </TouchableHighlight>
+                                </View>
+                            }
+                            {this.state.isLikedTrack === false &&
+                                <View style={styles.buttonRowStyle}>
+                                    <TouchableHighlight style={styles.button} underlayColor="#fff" >
+                                        <Icon name="ios-heart-empty"
+                                              type="ionicon"
+                                              size={26}
+                                              color={'#000'}
+                                        />
+                                    </TouchableHighlight>
+                                </View>
+                            }
+                            {this.state.isLikedTrack === true &&
+                                <View style={styles.buttonRowStyle}>
+                                    <TouchableHighlight style={styles.button} onPress={this.onLike} underlayColor="#fff">
+                                        <Icon name="ios-heart"
+                                            type="ionicon"
+                                            size={26}
+                                            color={'#8d6fb9'}
+                                        />
+                                    </TouchableHighlight>
+                                </View>
+                            }
                             <View style={styles.buttonRowStyle}>
                                 <TouchableHighlight style={styles.button} onPress={this.addPlaylist} underlayColor="#fff" >
                                     <Icon name="playlist-plus"
@@ -310,16 +367,55 @@ class Playlist extends Component {
                                 this.state.isTrack === false &&
                                 this.props.tracks.length !== 0 &&
                                 this.props.tracks.map((l, i) => (
-                                    <TouchableHighlight onPress={() => this.play(i)} onLongPress={this.onPressLong.bind(this, i, l)} style={{height: 40, justifyContent: 'center'}} underlayColor="#fff">
-                                        <View style={styles.listTrack}>
-                                            <View style={styles.rowIconOrNumberStyle}>
-                                                <Text style={styles.textNumber}>{l.id}</Text>
-                                            </View>
-                                            <View style={styles.rowStyle}>
-                                                <Text style={styles.textName}>{l.name_trc}</Text>
-                                            </View>
-                                        </View>
-                                    </TouchableHighlight>
+                                    <View>
+                                        {
+                                            this.props.current.id === l.id && this.props.isPlay === 'pause' &&
+                                            <TouchableHighlight onPress={() => this.playCurrent()} onLongPress={this.onPressLong.bind(this, i, l)} style={{height: 40, justifyContent: 'center'}} underlayColor="#fff">
+                                                <View style={styles.listTrack}>
+                                                    <View style={styles.rowIconOrNumberStyle}>
+                                                        <Icon name="ios-play"
+                                                              type="ionicon"
+                                                              size={16}
+                                                              color={'#000'}
+                                                        />
+                                                    </View>
+                                                    <View style={styles.rowStyle}>
+                                                        <Text style={styles.textName}>{l.name_trc}</Text>
+                                                    </View>
+                                                </View>
+                                            </TouchableHighlight>
+                                        }
+                                        {
+                                            this.props.current.id === l.id && this.props.isPlay !== 'pause' &&
+                                            <TouchableHighlight onPress={() => this.pauseCurrent()} onLongPress={this.onPressLong.bind(this, i, l)} style={{height: 40, justifyContent: 'center'}} underlayColor="#fff">
+                                                <View style={styles.listTrack}>
+                                                    <View style={styles.rowIconOrNumberStyle}>
+                                                        <Icon name="ios-pause"
+                                                              type="ionicon"
+                                                              size={16}
+                                                              color={'#000'}
+                                                        />
+                                                    </View>
+                                                    <View style={styles.rowStyle}>
+                                                        <Text style={styles.textName}>{l.name_trc}</Text>
+                                                    </View>
+                                                </View>
+                                            </TouchableHighlight>
+                                        }
+                                        {
+                                            this.props.current.id !== l.id &&
+                                            <TouchableHighlight onPress={() => this.play(i)} onLongPress={this.onPressLong.bind(this, i, l)} style={{height: 40, justifyContent: 'center'}} underlayColor="#fff">
+                                                <View style={styles.listTrack}>
+                                                    <View style={styles.rowIconOrNumberStyle}>
+                                                        <Text style={styles.textNumber}>{i + 1}</Text>
+                                                    </View>
+                                                    <View style={styles.rowStyle}>
+                                                        <Text style={styles.textName}>{l.name_trc}</Text>
+                                                    </View>
+                                                </View>
+                                            </TouchableHighlight>
+                                        }
+                                    </View>
                                 ))
                             }
                             {
@@ -396,9 +492,18 @@ class Playlist extends Component {
                         <View style={{marginBottom: 5, height: 40, justifyContent: 'center'}}>
                             {
                                 this.state.isTrack === true &&
-                                <Text style={styles.text}>{listens + ' прослушиваний'}</Text>
+                                <View>
+                                    <Text style={styles.text}>{listens + ' прослушиваний'}</Text>
+                                    <Text
+                                        style={styles.text}>{this.state.ratingTrack + ' пользователям понравилось'}</Text>
+                                </View>
                             }
-                            <Text style={styles.text}>{likes + ' пользователям понравилось'}</Text>
+                            {
+                                this.state.isTrack === false &&
+                                    <View>
+                                        <Text style={styles.text}>{likes + ' пользователям понравилось'}</Text>
+                                    </View>
+                            }
                         </View>
                     </View>
                 </View>
@@ -500,11 +605,12 @@ const styles = StyleSheet.create({
     titleTrack: {
         fontSize: 18,
         color: '#000',
-        marginBottom: 10
+        width: 150
     },
     titlePerformer: {
         fontSize: 15,
-        color: '#000'
+        color: '#000',
+        width: 150
     },
     textNumber: {
         fontSize: 16,
@@ -513,7 +619,8 @@ const styles = StyleSheet.create({
     textName: {
         fontSize: 16,
         color: '#000',
-        marginLeft: 20
+        marginLeft: 20,
+        width: 225
     },
     text: {
         fontSize: 13,
@@ -526,13 +633,22 @@ const styles = StyleSheet.create({
 });
 
 export default connect(
-    state => ({isPlay: state.player, edition: state.edition, random: state.random}),
+    state => ({isPlay: state.player, listen: state.listen, current: state.current, edition: state.edition, random: state.random}),
     dispatch => ({
         onPressPlayButton: () => {
             dispatch(playPlayer());
         },
+        onPressPauseButton: () => {
+            dispatch(pausePlayer());
+        },
         onPressReleasePlayButton: (audio) => {
             dispatch(releasePlayer(audio));
+        },
+        onListenPlayer: () => {
+            dispatch(listenPlayer());
+        },
+        onUnlistenPlayer: () => {
+            dispatch(unlistenPlayer());
         },
         onAddTrackQueue: (track) => {
             dispatch(addTrackQueue(track));

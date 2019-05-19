@@ -10,6 +10,7 @@ import Swiper from "react-native-swiper";
 import store from "../../redux/store";
 
 import Track from '../Track';
+import {createPrevious, createQueue, releasePlayer} from "../../redux/actions/player";
 
 
 class FullPlayer extends Component {
@@ -47,6 +48,8 @@ class FullPlayer extends Component {
         isPlay: PropTypes.string.isRequired,
         isRandom: PropTypes.bool.isRequired,
         random: PropTypes.func.isRequired,
+        repeatStatus: PropTypes.string.isRequired,
+        repeat: PropTypes.func.isRequired,
         queue: PropTypes.array.isRequired
     }
 
@@ -142,6 +145,36 @@ class FullPlayer extends Component {
         this.props.pauseTrack()
     }
 
+    playTrack(key)
+    {
+        let prev = this.props.previous.slice()
+        prev.push(this.props.current)
+        let queue = []
+        this.props.queue.map((l, i) =>
+        {
+            if(i < key)
+            {
+                prev.push(l)
+            }
+            else if(i >= key)
+            {
+                queue.push(l)
+            }
+        })
+        this.props.onCreatePrevious(prev)
+        this.props.onCreateQueue(queue)
+        this.props.onPressReleasePlayButton(this.props.queue[key].audio);
+    }
+
+    changeOrder(currentOrder)
+    {
+        let queue = []
+        currentOrder.map((l, i) =>
+        {
+            queue.push(this.props.queue[l])
+        })
+        this.props.onCreateQueue(queue)
+    }
     static getAudioTimeString(seconds)
     {
         const m = parseInt(seconds % (60 * 60) / 60);
@@ -157,19 +190,7 @@ class FullPlayer extends Component {
 
     onRepeatButton()
     {
-        if(this.state.buttonRepeat === 'disable')
-        {
-            this.setState({buttonRepeat: 'enable'});
-        }
-        else if(this.state.buttonRepeat === 'enable')
-        {
-            this.setState({buttonRepeat: 'enable-one'});
-        }
-        else if(this.state.buttonRepeat === 'enable-one')
-        {
-            this.setState({buttonRepeat: 'disable'});
-        }
-
+        this.props.repeat()
     }
 
     onLike()
@@ -177,8 +198,8 @@ class FullPlayer extends Component {
         this.setState({isLike: !this.state.isLike});
     }
 
-    _renderRow = ({data, active}) => {
-        return <Track data={data} />
+    _renderRow = ({data}) => {
+        return <Track data={data}  />
     }
 
     // _renderRow = ({data, active}) => {
@@ -376,7 +397,8 @@ class FullPlayer extends Component {
                                         contentContainerStyle={styles.queueList}
                                         data={queue}
                                         showsVerticalScrollIndicator={false}
-                                        onPressRow={(key) => {ToastAndroid.show(key, ToastAndroid.SHORT)}}
+                                        onPressRow={(key) => this.playTrack(key)}
+                                        onReleaseRow={(key, currentOrder) => this.changeOrder(currentOrder)}
                                         renderRow={this._renderRow} />
                                 }
                             </View>
@@ -410,7 +432,7 @@ class FullPlayer extends Component {
                                     </TouchableHighlight>
                                 </View>
                             }
-                            {this.state.buttonRepeat === 'disable' &&
+                            {this.props.repeatStatus === 'unrepeat' &&
                                 <View style={{marginLeft: Dimensions.get('window').width - 250}}>
                                     <TouchableHighlight style={styles.button} underlayColor="#fff"
                                                         onPress={this.onRepeatButton}>
@@ -422,7 +444,7 @@ class FullPlayer extends Component {
                                     </TouchableHighlight>
                                 </View>
                             }
-                            {this.state.buttonRepeat === 'enable' &&
+                            {this.props.repeatStatus === 'repeat' &&
                                 <View style={{marginLeft: Dimensions.get('window').width - 250}}>
                                     <TouchableHighlight style={styles.button} underlayColor="#fff"
                                                         onPress={this.onRepeatButton}>
@@ -434,7 +456,7 @@ class FullPlayer extends Component {
                                     </TouchableHighlight>
                                 </View>
                             }
-                            {this.state.buttonRepeat === 'enable-one' &&
+                            {this.props.repeatStatus === 'repeat-one' &&
                                 <View style={{marginLeft: Dimensions.get('window').width - 250}}>
                                     <TouchableHighlight style={styles.button} underlayColor="#fff"
                                                         onPress={this.onRepeatButton}>
@@ -499,7 +521,8 @@ const styles = StyleSheet.create({
     },
     nameTrack: {
         color: '#000',
-        fontSize: 24
+        fontSize: 24,
+        alignItems: 'center'
     },
     queue: {
         width: Dimensions.get('window').width,
@@ -577,4 +600,17 @@ const styles = StyleSheet.create({
     },
 });
 
-export default connect()(FullPlayer)
+export default connect(
+    state => ({previous: state.previous, current: state.current}),
+    dispatch => ({
+        onCreatePrevious: (tracks) => {
+            dispatch(createPrevious(tracks));
+        },
+        onCreateQueue: (tracks) => {
+            dispatch(createQueue(tracks));
+        },
+        onPressReleasePlayButton: (audio) => {
+            dispatch(releasePlayer(audio));
+        }
+    })
+)(FullPlayer)

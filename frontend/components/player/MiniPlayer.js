@@ -75,7 +75,7 @@ class MiniPlayer extends Component {
                                     <View style={styles.nameTrack}>
                                         {
                                             nameTrack &&
-                                            <Text style={styles.title}>{nameTrack}</Text>
+                                            <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>{nameTrack}</Text>
                                         }
                                         {
                                             !nameTrack &&
@@ -127,6 +127,7 @@ class MiniPlayer extends Component {
 const styles = StyleSheet.create({
     title: {
         fontSize: 16,
+        width: Dimensions.get('window').width - 210
     },
     container:{
         // transform: [
@@ -182,26 +183,3 @@ const styles = StyleSheet.create({
 });
 
 export default MiniPlayer;
-//
-// export default connect(
-//     state => ({codeMessage: state.codeMessage, accountData: state.accountData}),
-//     dispatch => ({
-//         onSendMessage: (number) => {
-//             dispatch(sendMessage(number));
-//         },
-//         onСlearData: () => {
-//             dispatch(clearData());
-//         }
-//     })
-// )(NumberInput)
-
-
-// const mapStateToProps = (state) => ({
-//     isPlay: state.player
-// })
-// export default connect((mapStateToProps), {
-//     onPressPlayButton: PlayerAction.playPlayer,
-//     onPressPauseButton: PlayerAction.pausePlayer
-// })(MiniPlayer)
-//
-// export default connect()(MiniPlayer)

@@ -9,8 +9,9 @@ import FullPlayer from "../../components/player/FullPlayer";
 
 import Sound from 'react-native-sound';
 import {
-    playPlayer, pausePlayer, addTrackPrevious, addBeginQueue, addCurrent, deleteTrackPrevious, deleteTrackQueue,
-    createCommonMusic, createRandomMusic, createPrevious, createQueue, shuffleListTrack
+    playPlayer, pausePlayer, listenPlayer, unlistenPlayer, addTrackPrevious, addBeginPrevious, addBeginQueue,
+    addCurrent, deleteTrackPrevious, clearPrevious, deleteTrackQueue, createCommonMusic, createRandomMusic,
+    createPrevious, addTrackQueue, createQueue, clearQueue, unrepeatMusic, repeatMusic, repeatOneMusic, shuffleListTrack
 } from "../../redux/actions/player";
 
 class AppMusic extends React.Component {
@@ -25,13 +26,12 @@ class AppMusic extends React.Component {
         }
         this.open = this.open.bind(this)
         this.close = this.close.bind(this)
-        // this.play = this.play.bind(this)
-        // this.pause = this.pause.bind(this)
         this.run = this.run.bind(this)
         this.stop = this.stop.bind(this)
         this.prev = this.prev.bind(this)
         this.next = this.next.bind(this)
         this.random = this.random.bind(this)
+        this.repeat = this.repeat.bind(this)
     }
 
     componentDidMount()
@@ -60,6 +60,7 @@ class AppMusic extends React.Component {
                 this.play({audio: this.props.isPlay});
                 this.props.onAddCurrent(this.props.queue[0]);
                 this.props.onDeleteTrackQueue();
+                // this.props.onPressPlayButton()
 
             }
         }
@@ -82,7 +83,13 @@ class AppMusic extends React.Component {
 
     stop()
     {
-        this.props.onPressPauseButton()
+        setTimeout(() => {
+            if(this.props.listen === true)
+            {
+                this.props.onPressPauseButton()
+                this.props.onUnlistenPlayer()
+            }
+        }, 1000);
     }
 
     play(track)
@@ -102,23 +109,66 @@ class AppMusic extends React.Component {
         {
             this.sound = new Sound(track.audio, Sound.MAIN_BUNDLE, (error) => {
                 if (error) {
-                    ToastAndroid.show('Error', ToastAndroid.SHORT);
+                    ToastAndroid.show('Error1', ToastAndroid.SHORT);
                 } else {
+                    this.props.onListenPlayer()
                     this.sound.play((success) => {
                         if (success)
                         {
-                            if(this.props.queue.length > 0)
+                            this.props.onUnlistenPlayer()
+                            if(this.props.repeat === 'unrepeat' || this.props.repeat === 'repeat')
+                            {
+                                if(this.props.queue.length > 0)
+                                {
+                                    this.sound.release();
+                                    this.play(this.props.queue[0]);
+                                    this.props.onAddTrackPrevious(this.props.current)
+                                    this.props.onAddCurrent(this.props.queue[0])
+                                    this.props.onDeleteTrackQueue()
+                                    this.props.onPressPlayButton()
+                                }
+                                else if (this.props.previous.length === 0 && this.props.queue.length === 0)
+                                {
+                                    if(this.props.repeat === 'repeat')
+                                    {
+                                        this.sound.release();
+                                        this.props.onPressPauseButton();
+                                        this.play(this.props.current);
+                                        this.props.onPressPlayButton();
+                                    }
+                                    else
+                                    {
+                                        this.props.onPressPauseButton();
+                                    }
+                                }
+                                else
+                                {
+                                    if(this.props.repeat === 'repeat')
+                                    {
+                                        this.sound.release();
+                                        this.play(this.props.previous[0]);
+                                        this.props.onAddTrackPrevious(this.props.current)
+                                        this.props.onAddCurrent(this.props.previous[0])
+                                        this.props.onCreateQueue(this.props.previous.slice(1))
+                                        this.props.onClearPrevious()
+                                        this.props.onPressPlayButton()
+                                    }
+                                    else
+                                    {
+                                        this.props.onPressPauseButton();
+                                    }
+                                }
+                            }
+                            else
                             {
                                 this.sound.release();
-                                this.play(this.props.queue[0]);
-                                this.props.onAddTrackPrevious(this.props.current)
-                                this.props.onAddCurrent(this.props.queue[0])
-                                this.props.onDeleteTrackQueue()
+                                this.props.onPressPauseButton();
+                                this.play(this.props.current);
                                 this.props.onPressPlayButton()
                             }
                         }
                         else {
-                            ToastAndroid.show('Error', ToastAndroid.SHORT);
+                            ToastAndroid.show('Error2', ToastAndroid.SHORT);
                         }
                     });
                 }
@@ -126,22 +176,64 @@ class AppMusic extends React.Component {
         }
         else
         {
+            this.props.onListenPlayer()
             this.sound.play((success) => {
                 if (success)
                 {
-                    if(this.props.queue.length > 0)
+                    if(this.props.repeat === 'unrepeat' || this.props.repeat === 'repeat')
+                    {
+                        if(this.props.queue.length > 0)
+                        {
+                            this.sound.release();
+                            this.play(this.props.queue[0]);
+                            this.props.onAddTrackPrevious(this.props.current)
+                            this.props.onAddCurrent(this.props.queue[0])
+                            this.props.onDeleteTrackQueue()
+                            this.props.onPressPlayButton()
+                        }
+                        else if (this.props.previous.length === 0 && this.props.queue.length === 0)
+                        {
+                            if(this.props.repeat === 'repeat')
+                            {
+                                this.sound.release();
+                                this.props.onPressPauseButton();
+                                this.play(this.props.current);
+                                this.props.onPressPlayButton();
+                            }
+                            else
+                            {
+                                this.props.onPressPauseButton();
+                            }
+                        }
+                        else
+                        {
+                            if(this.props.repeat === 'repeat')
+                            {
+                                this.sound.release();
+                                this.play(this.props.previous[0]);
+                                this.props.onAddTrackPrevious(this.props.current)
+                                this.props.onAddCurrent(this.props.previous[0])
+                                this.props.onCreateQueue(this.props.previous.slice(1))
+                                this.props.onClearPrevious()
+                                this.props.onPressPlayButton()
+                            }
+                            else
+                            {
+                                this.props.onPressPauseButton();
+                            }
+                        }
+                    }
+                    else
                     {
                         this.sound.release();
-                        this.play(this.props.queue[0]);
-                        this.props.onAddTrackPrevious(this.props.current)
-                        this.props.onAddCurrent(this.props.queue[0])
-                        this.props.onDeleteTrackQueue()
+                        this.props.onPressPauseButton();
+                        this.play(this.props.current);
                         this.props.onPressPlayButton()
                     }
                 }
                 else
                 {
-                    ToastAndroid.show('Error', ToastAndroid.SHORT);
+                    ToastAndroid.show('Error3', ToastAndroid.SHORT);
                 }
             });
         }
@@ -154,6 +246,7 @@ class AppMusic extends React.Component {
 
     prev()
     {
+        this.props.onUnlistenPlayer()
         if(this.props.previous.length > 0)
         {
             this.sound.release();
@@ -163,10 +256,28 @@ class AppMusic extends React.Component {
             this.props.onDeleteTrackPrevious()
             this.props.onPressPlayButton()
         }
+        else if(this.props.previous.length === 0 && this.props.queue.length === 0)
+        {
+
+        }
+        else
+        {
+            if(this.props.repeat === 'repeat')
+            {
+                this.sound.release();
+                this.play(this.props.queue[this.props.queue.length - 1]);
+                this.props.onCreatePrevious(this.props.queue.slice(0, this.props.queue.length - 1))
+                this.props.onAddBeginPrevious(this.props.current)
+                this.props.onAddCurrent(this.props.queue[this.props.queue.length - 1])
+                this.props.onClearQueue()
+                this.props.onPressPlayButton()
+            }
+        }
     }
 
     next()
     {
+        this.props.onUnlistenPlayer()
         if(this.props.queue.length > 0)
         {
             this.sound.release();
@@ -175,6 +286,23 @@ class AppMusic extends React.Component {
             this.props.onAddCurrent(this.props.queue[0])
             this.props.onDeleteTrackQueue()
             this.props.onPressPlayButton()
+        }
+        else if(this.props.previous.length === 0 && this.props.queue.length === 0)
+        {
+
+        }
+        else
+        {
+            if(this.props.repeat === 'repeat')
+            {
+                this.sound.release();
+                this.play(this.props.previous[0]);
+                this.props.onCreateQueue(this.props.previous.slice(1))
+                this.props.onAddTrackQueue(this.props.current)
+                this.props.onAddCurrent(this.props.previous[0])
+                this.props.onClearPrevious()
+                this.props.onPressPlayButton()
+            }
         }
     }
 
@@ -235,6 +363,21 @@ class AppMusic extends React.Component {
         }
     }
 
+    repeat()
+    {
+        if(this.props.repeat === 'unrepeat')
+        {
+            this.props.onRepeatMusic();
+        }
+        else if(this.props.repeat === 'repeat')
+        {
+            this.props.onRepeatOneMusic();
+        }
+        else if(this.props.repeat === 'repeat-one')
+        {
+            this.props.onUnrepeatMusic();
+        }
+    }
 
     render() {
 
@@ -269,6 +412,8 @@ class AppMusic extends React.Component {
                                 isPlay={this.props.isPlay}
                                 isRandom={this.props.random}
                                 random={this.random}
+                                repeatStatus={this.props.repeat}
+                                repeat={this.repeat}
                                 queue={queue} />
                         </View>
                     }
@@ -295,8 +440,8 @@ const styles = StyleSheet.create({
 });
 
 export default connect(
-    state => ({isPlay: state.player, previous: state.previous, current: state.current, queue: state.queue,
-        playlist: state.playlist, random: state.random}),
+    state => ({isPlay: state.player, listen: state.listen, previous: state.previous, current: state.current,
+        queue: state.queue, playlist: state.playlist, random: state.random, repeat: state.repeat}),
     dispatch => ({
         onPressPlayButton: () => {
             dispatch(playPlayer());
@@ -304,8 +449,17 @@ export default connect(
         onPressPauseButton: () => {
             dispatch(pausePlayer());
         },
+        onListenPlayer: () => {
+            dispatch(listenPlayer());
+        },
+        onUnlistenPlayer: () => {
+            dispatch(unlistenPlayer());
+        },
         onAddTrackPrevious: (track) => {
             dispatch(addTrackPrevious(track));
+        },
+        onAddBeginPrevious: (track) => {
+            dispatch(addBeginPrevious(track));
         },
         onAddBeginQueue: (track) => {
             dispatch(addBeginQueue(track));
@@ -319,6 +473,9 @@ export default connect(
         onDeleteTrackQueue: () => {
             dispatch(deleteTrackQueue());
         },
+        onClearPrevious: () => {
+            dispatch(clearPrevious());
+        },
         onCreateCommonMusic: () => {
             dispatch(createCommonMusic());
         },
@@ -330,6 +487,21 @@ export default connect(
         },
         onCreateQueue: (tracks) => {
             dispatch(createQueue(tracks));
+        },
+        onClearQueue: () => {
+            dispatch(clearQueue());
+        },
+        onUnrepeatMusic: () => {
+            dispatch(unrepeatMusic());
+        },
+        onRepeatMusic: () => {
+            dispatch(repeatMusic());
+        },
+        onRepeatOneMusic: () => {
+            dispatch(repeatOneMusic());
+        },
+        onAddTrackQueue: (track) => {
+            dispatch(addTrackQueue(track));
         }
     })
 )(AppMusic)

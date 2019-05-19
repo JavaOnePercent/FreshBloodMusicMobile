@@ -2,6 +2,8 @@ import {Dimensions, StyleSheet, Text, ToastAndroid, TouchableHighlight, View} fr
 import {Icon, Image} from "react-native-elements";
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
+import { removeTrackQueue, removeTrackPlaylist } from "../redux/actions/player";
+import {connect} from "react-redux";
 
 class Track extends Component {
 
@@ -11,6 +13,12 @@ class Track extends Component {
 
     static propTypes = {
         data: PropTypes.object.isRequired
+    }
+
+    deleteTrack(id)
+    {
+        this.props.onRemoveTrackQueue(id)
+        this.props.onRemoveTrackPlaylist(id)
     }
 
     render() {
@@ -33,15 +41,13 @@ class Track extends Component {
                         marginLeft: 10,
                         marginTop: 12
                     }}>
-                        <Text style={styles.titleTrack}>{data.title}</Text>
+                        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.titleTrack}>{data.title}</Text>
                         <Text style={styles.titlePerformer}>{data.performer}</Text>
                     </View>
                 </View>
                 <View style={styles.rowStyle}>
-                    <TouchableHighlight style={styles.button} onPress={() => {
-                        ToastAndroid.show('Success', ToastAndroid.SHORT)
-                    }} underlayColor="#fff">
-                        <Icon name="md-more"
+                    <TouchableHighlight style={styles.button} onPress={() => this.deleteTrack(data.id)} underlayColor="#fff">
+                        <Icon name="md-remove-circle"
                               type="ionicon"
                               size={28}
                               color={'#000'}
@@ -85,4 +91,14 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Track;
+export default connect(
+    state => ({isPlay: state.player}),
+    dispatch => ({
+        onRemoveTrackQueue: (id) => {
+            dispatch(removeTrackQueue(id));
+        },
+        onRemoveTrackPlaylist: (id) => {
+            dispatch(removeTrackPlaylist(id));
+        }
+    })
+)(Track)
