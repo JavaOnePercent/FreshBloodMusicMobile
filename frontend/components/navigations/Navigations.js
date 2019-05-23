@@ -25,15 +25,17 @@ import Podcasts from "../../views/mainapp/podcasts/Podcasts";
 
 import Radio from "../../views/mainapp/radio/Radio";
 
+import Profile from "../../views/mainapp/Profile";
+
 const TabNewsStack = createStackNavigator(
     {
-        Main: { screen: News }
+        Main: { screen: News },
     }
 );
 
 const TabChartsStack = createStackNavigator(
     {
-        Charts: { screen: Charts }
+        Charts: { screen: Charts },
     }
 );
 
@@ -52,6 +54,7 @@ const TabFavoritesStack = createStackNavigator(
 const TabPodcastsStack = createStackNavigator(
     {
         Podcasts: { screen: Podcasts },
+        Profile: {screen: Profile},
     }
 );
 
@@ -102,7 +105,7 @@ const MainAppStack = createBottomTabNavigator({
             })},
         Favorites: { screen: TabFavoritesStack,
             navigationOptions: ({navigation}) => ({
-                tabBarLabel: 'Избранное',
+                tabBarLabel: 'Моя музыка',
                 tabBarIcon: ({tintColor}) => (
                     <Icon name="heart"
                           type="font-awesome"

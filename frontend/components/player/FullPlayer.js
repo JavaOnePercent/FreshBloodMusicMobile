@@ -24,14 +24,14 @@ class FullPlayer extends Component {
             volume: 0.0,
             showDuration: 0,
             buttonRepeat: 'disable',
-            buttonRandom: false,
-            isLike: false
+            buttonRandom: false
         }
 
         this.play = this.play.bind(this)
         this.pause = this.pause.bind(this)
         this.onRandomButton = this.onRandomButton.bind(this)
         this.onRepeatButton = this.onRepeatButton.bind(this)
+        this.onOpenPagePerformer = this.onOpenPagePerformer.bind(this)
         this.onLike = this.onLike.bind(this)
     }
 
@@ -50,6 +50,9 @@ class FullPlayer extends Component {
         random: PropTypes.func.isRequired,
         repeatStatus: PropTypes.string.isRequired,
         repeat: PropTypes.func.isRequired,
+        isLiked: PropTypes.bool.isRequired,
+        likes: PropTypes.func.isRequired,
+        performer: PropTypes.func.isRequired,
         queue: PropTypes.array.isRequired
     }
 
@@ -195,7 +198,12 @@ class FullPlayer extends Component {
 
     onLike()
     {
-        this.setState({isLike: !this.state.isLike});
+        this.props.likes()
+    }
+
+    onOpenPagePerformer()
+    {
+        this.props.performer()
     }
 
     _renderRow = ({data}) => {
@@ -237,7 +245,7 @@ class FullPlayer extends Component {
         const currentTimeString = FullPlayer.getAudioTimeString(this.state.playSeconds);
         const durationString = FullPlayer.getAudioTimeString(this.state.showDuration);
 
-        const { iconAlbum, namePerformer, nameTrack, prevTrack, nextTrack, closePlayer, queue } = this.props;
+        const { iconAlbum, namePerformer, nameTrack, prevTrack, nextTrack, closePlayer, queue, isLiked } = this.props;
         return (
             <Provider store={store}>
                 <View style={styles.container}>
@@ -291,14 +299,14 @@ class FullPlayer extends Component {
                                 <View style={styles.buttonContainer}>
                                     <View style={styles.rowStyle}>
                                         <View style={styles.play}>
-                                            {this.state.isLike === false &&
+                                            {isLiked === false &&
                                             <TouchableHighlight style={styles.button} onPress={this.onLike} underlayColor="#fff">
                                                 <Icon name="ios-heart-empty" type="ionicon" size={28} color={'#000'}
                                                 />
                                             </TouchableHighlight>
                                             }
 
-                                            {this.state.isLike === true &&
+                                            {isLiked === true &&
                                             <TouchableHighlight style={styles.button} onPress={this.onLike} underlayColor="#fff">
                                                 <Icon name="ios-heart"
                                                       type="ionicon"
@@ -356,7 +364,7 @@ class FullPlayer extends Component {
                                     </View>
                                     <View style={styles.rowStyle}>
                                         <View style={styles.play}>
-                                            <TouchableHighlight style={styles.button} underlayColor="#fff">
+                                            <TouchableHighlight style={styles.button} onPress={this.onOpenPagePerformer} underlayColor="#fff">
                                                 <Icon name="microphone-variant"
                                                       type="material-community"
                                                       size={28}

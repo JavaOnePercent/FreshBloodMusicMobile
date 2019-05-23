@@ -1,9 +1,19 @@
 import React, { Component } from 'react';
-import {View, Text, StyleSheet, ActivityIndicator, AsyncStorage, RefreshControl, ScrollView} from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    ActivityIndicator,
+    AsyncStorage,
+    RefreshControl,
+    ScrollView,
+    Platform
+} from 'react-native';
 import { Provider, connect } from 'react-redux';
 import store from "../../../redux/store";
 import Edition from "../../../components/Edition";
 import {ADDRESS_SERVER} from "../../../components/constants/constants";
+import {SearchBar} from "react-native-elements";
 
 class Podcasts extends Component {
     constructor(props) {
@@ -79,8 +89,31 @@ class Podcasts extends Component {
                     }
                 >
                     <View style={styles.container}>
-                        <Edition titleList={'Новые подкасты'} editionArray={this.state.editionArray} />
-                        <Edition titleList={'Популярные подкасты'} editionArray={this.state.editionArray} />
+                        {Platform.OS === 'android' &&
+                        <SearchBar
+                            platform="android"
+                            placeholder="Поиск групп, изданий, треков..."
+                            onChangeText={this.updateSearch}
+                            inputContainerStyle={{backgroundColor: '#fff'}}
+                            value={this.state.search}
+                            lightTheme={true}
+                            round={true}
+                            onCancel={this.kekis}
+                        />}
+                        {Platform.OS === 'ios' &&
+                        <SearchBar
+                            platform="ios"
+                            placeholder="Поиск групп, изданий, треков..."
+                            onChangeText={this.updateSearch}
+                            inputContainerStyle={{backgroundColor: '#fff'}}
+                            value={this.state.search}
+                            lightTheme={true}
+                            round={true}
+                            cancelButtonProps={{color: '#8d6fb9'}}
+                            onCancel={this.kekis}
+                        />}
+                        {/*<Edition titleList={'Новые подкасты'} editionArray={this.state.editionArray} />*/}
+                        {/*<Edition titleList={'Популярные подкасты'} editionArray={this.state.editionArray} />*/}
                     </View>
                 </ScrollView>
             </Provider>
@@ -91,8 +124,7 @@ class Podcasts extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        paddingTop: 15
+        backgroundColor: '#fff'
     },
 });
 

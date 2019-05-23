@@ -7,12 +7,38 @@ import {connect, Provider} from "react-redux";
 import MiniPlayer from "../../components/player/MiniPlayer";
 import FullPlayer from "../../components/player/FullPlayer";
 
+import Profile from "../../views/mainapp/Profile";
+
 import Sound from 'react-native-sound';
 import {
-    playPlayer, pausePlayer, listenPlayer, unlistenPlayer, addTrackPrevious, addBeginPrevious, addBeginQueue,
-    addCurrent, deleteTrackPrevious, clearPrevious, deleteTrackQueue, createCommonMusic, createRandomMusic,
-    createPrevious, addTrackQueue, createQueue, clearQueue, unrepeatMusic, repeatMusic, repeatOneMusic, shuffleListTrack
+    playPlayer,
+    pausePlayer,
+    listenPlayer,
+    unlistenPlayer,
+    addTrackPrevious,
+    addBeginPrevious,
+    addBeginQueue,
+    addCurrent,
+    deleteTrackPrevious,
+    clearPrevious,
+    deleteTrackQueue,
+    createCommonMusic,
+    createRandomMusic,
+    createPrevious,
+    addTrackQueue,
+    createQueue,
+    clearQueue,
+    unrepeatMusic,
+    repeatMusic,
+    repeatOneMusic,
+    shuffleListTrack,
+    likeCurrent,
+    unlikeCurrent,
+    likeTrackPlaylist,
+    unlikeTrackPlaylist
 } from "../../redux/actions/player";
+import {createCurrentProfile, getAlbumsPerformer, getPerformer} from "../../redux/actions/performer";
+import {addLikeTrack, deleteLikeTrack, incrementListening} from "../../redux/actions/news";
 
 class AppMusic extends React.Component {
 
@@ -32,6 +58,8 @@ class AppMusic extends React.Component {
         this.next = this.next.bind(this)
         this.random = this.random.bind(this)
         this.repeat = this.repeat.bind(this)
+        this.likes = this.likes.bind(this)
+        this.performer = this.performer.bind(this)
     }
 
     componentDidMount()
@@ -115,6 +143,7 @@ class AppMusic extends React.Component {
                     this.sound.play((success) => {
                         if (success)
                         {
+                            this.props.onIncrementListening(this.props.current.id)
                             this.props.onUnlistenPlayer()
                             if(this.props.repeat === 'unrepeat' || this.props.repeat === 'repeat')
                             {
@@ -180,6 +209,7 @@ class AppMusic extends React.Component {
             this.sound.play((success) => {
                 if (success)
                 {
+                    this.props.onIncrementListening(this.props.current.id)
                     if(this.props.repeat === 'unrepeat' || this.props.repeat === 'repeat')
                     {
                         if(this.props.queue.length > 0)
@@ -379,6 +409,34 @@ class AppMusic extends React.Component {
         }
     }
 
+    likes()
+    {
+        if(this.props.auth.id !== -1 && this.props.auth.id !== 0)
+        {
+            if (this.props.current.isLiked === false) {
+
+                this.props.onAddLikeTrack(this.props.current.id)
+                this.props.onLikeCurrent()
+                this.props.onLikeTrackPlaylist(this.props.current.id)
+
+            }
+            else if (this.props.current.isLiked === true)
+            {
+                this.props.onDeleteLikeTrack(this.props.current.id)
+                this.props.onUnlikeCurrent()
+                this.props.onUnlikeTrackPlaylist(this.props.current.id)
+            }
+        }
+    }
+
+    performer()
+    {
+        this.close()
+        this.props.onGetPerformer(this.props.current.idPerformer);
+        this.props.onGetAlbumsPerformer(this.props.current.idPerformer);
+        this.props.onCreateCurrentProfile(this.props.current.idPerformer);
+        Navigations.navigate('Profile', { Profile: 'Profile' });
+    }
     render() {
 
         const { current, queue } = this.props;
@@ -414,6 +472,9 @@ class AppMusic extends React.Component {
                                 random={this.random}
                                 repeatStatus={this.props.repeat}
                                 repeat={this.repeat}
+                                isLiked={current.isLiked}
+                                likes={this.likes}
+                                performer={this.performer}
                                 queue={queue} />
                         </View>
                     }
@@ -441,7 +502,7 @@ const styles = StyleSheet.create({
 
 export default connect(
     state => ({isPlay: state.player, listen: state.listen, previous: state.previous, current: state.current,
-        queue: state.queue, playlist: state.playlist, random: state.random, repeat: state.repeat}),
+        queue: state.queue, playlist: state.playlist, random: state.random, repeat: state.repeat, auth: state.auth}),
     dispatch => ({
         onPressPlayButton: () => {
             dispatch(playPlayer());
@@ -466,6 +527,12 @@ export default connect(
         },
         onAddCurrent: (track) => {
             dispatch(addCurrent(track));
+        },
+        onLikeCurrent: () => {
+            dispatch(likeCurrent());
+        },
+        onUnlikeCurrent: () => {
+            dispatch(unlikeCurrent());
         },
         onDeleteTrackPrevious: () => {
             dispatch(deleteTrackPrevious());
@@ -502,6 +569,31 @@ export default connect(
         },
         onAddTrackQueue: (track) => {
             dispatch(addTrackQueue(track));
-        }
+        },
+        onCreateCurrentProfile: (id) => {
+            dispatch(createCurrentProfile(id));
+        },
+        onGetPerformer: (id) => {
+            dispatch(getPerformer(id));
+        },
+        onGetAlbumsPerformer: (id) => {
+            dispatch(getAlbumsPerformer(id));
+        },
+        onAddLikeTrack: (id) => {
+            dispatch(addLikeTrack(id));
+        },
+        onDeleteLikeTrack: (id) => {
+            dispatch(deleteLikeTrack(id));
+        },
+        onIncrementListening: (id) => {
+            dispatch(incrementListening(id));
+        },
+        onLikeTrackPlaylist: (id) => {
+            dispatch(likeTrackPlaylist(id));
+        },
+        onUnlikeTrackPlaylist: (id) => {
+            dispatch(unlikeTrackPlaylist(id));
+        },
+
     })
 )(AppMusic)

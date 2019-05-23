@@ -13,12 +13,18 @@ import {
     PLAYER_UNLIKE_MUSIC,
     PLAYER_CREATE_PREVIOUS,
     PLAYER_ADD_TRACK_PREVIOUS,
+    PLAYER_LIKE_TRACK_PREVIOUS,
+    PLAYER_UNLIKE_TRACK_PREVIOUS,
     PLAYER_ADD_BEGIN_PREVIOUS,
     PLAYER_DELETE_PREVIOUS,
     PLAYER_CLEAR_PREVIOUS,
     PLAYER_ADD_CURRENT_TRACK,
+    PLAYER_LIKE_CURRENT_TRACK,
+    PLAYER_UNLIKE_CURRENT_TRACK,
     PLAYER_CREATE_QUEUE,
     PLAYER_ADD_TRACK_QUEUE,
+    PLAYER_LIKE_TRACK_QUEUE,
+    PLAYER_UNLIKE_TRACK_QUEUE,
     PLAYER_ADD_EDITION_QUEUE,
     PLAYER_ADD_BEGIN_QUEUE,
     PLAYER_CHANGE_QUEUE,
@@ -28,6 +34,8 @@ import {
     PLAYER_CREATE_PLAYLIST,
     PLAYER_ADD_EDITION_PLAYLIST,
     PLAYER_ADD_TRACK_PLAYLIST,
+    PLAYER_LIKE_TRACK_PLAYLIST,
+    PLAYER_UNLIKE_TRACK_PLAYLIST,
     PLAYER_REMOVE_PLAYLIST,
     PLAYER_CLEAR_PLAYLIST
 } from '../actions/types';
@@ -119,6 +127,28 @@ export function previous (state = [], action) {
         case PLAYER_ADD_TRACK_PREVIOUS:
             ToastAndroid.show(PLAYER_ADD_TRACK_PREVIOUS, ToastAndroid.SHORT);
             return [...state, action.payload];
+        case PLAYER_LIKE_TRACK_PREVIOUS:
+            ToastAndroid.show(PLAYER_LIKE_TRACK_PREVIOUS, ToastAndroid.SHORT);
+            return state.map((album, index) => {
+                if (album.id === action.payload) {
+                    return {
+                        ...album,
+                        isLiked: true
+                    }
+                }
+                return album;
+            })
+        case PLAYER_UNLIKE_TRACK_PREVIOUS:
+            ToastAndroid.show(PLAYER_UNLIKE_TRACK_PREVIOUS, ToastAndroid.SHORT);
+            return state.map((album, index) => {
+                if (album.id === action.payload) {
+                    return {
+                        ...album,
+                        isLiked: false
+                    }
+                }
+                return album;
+            })
         case PLAYER_ADD_BEGIN_PREVIOUS:
             ToastAndroid.show(PLAYER_ADD_BEGIN_PREVIOUS, ToastAndroid.SHORT);
             return [action.payload, ...state];
@@ -139,6 +169,12 @@ export function current (state = {}, action) {
         case PLAYER_ADD_CURRENT_TRACK:
             ToastAndroid.show(PLAYER_ADD_CURRENT_TRACK, ToastAndroid.SHORT);
             return action.payload;
+        case PLAYER_LIKE_CURRENT_TRACK:
+            ToastAndroid.show(PLAYER_LIKE_CURRENT_TRACK, ToastAndroid.SHORT);
+            return {...state, isLiked: true};
+        case PLAYER_UNLIKE_CURRENT_TRACK:
+            ToastAndroid.show(PLAYER_UNLIKE_CURRENT_TRACK, ToastAndroid.SHORT);
+            return {...state, isLiked: false};
         default:
             return state;
     }
@@ -153,6 +189,28 @@ export function queue (state = [], action) {
         case PLAYER_ADD_TRACK_QUEUE:
             ToastAndroid.show(PLAYER_ADD_TRACK_QUEUE, ToastAndroid.SHORT);
             return [...state, action.payload];
+        case PLAYER_LIKE_TRACK_QUEUE:
+            ToastAndroid.show(PLAYER_LIKE_TRACK_QUEUE, ToastAndroid.SHORT);
+            return state.map((album, index) => {
+                if (album.id === action.payload) {
+                    return {
+                        ...album,
+                        isLiked: true
+                    }
+                }
+                return album;
+            })
+        case PLAYER_UNLIKE_TRACK_QUEUE:
+            ToastAndroid.show(PLAYER_UNLIKE_TRACK_QUEUE, ToastAndroid.SHORT);
+            return state.map((album, index) => {
+                if (album.id === action.payload) {
+                    return {
+                        ...album,
+                        isLiked: false
+                    }
+                }
+                return album;
+            })
         case PLAYER_ADD_EDITION_QUEUE:
             ToastAndroid.show(PLAYER_ADD_EDITION_QUEUE, ToastAndroid.SHORT);
             if(state.length === 0 || !state)
@@ -202,6 +260,28 @@ export function playlist (state = [], action) {
             {
                 return [...state.concat(action.payload)];
             }
+        case PLAYER_LIKE_TRACK_PLAYLIST:
+            ToastAndroid.show(PLAYER_LIKE_TRACK_PLAYLIST, ToastAndroid.SHORT);
+            return state.map((album, index) => {
+                if (album.id === action.payload) {
+                    return {
+                        ...album,
+                        isLiked: true
+                    }
+                }
+                return album;
+            })
+        case PLAYER_UNLIKE_TRACK_PLAYLIST:
+            ToastAndroid.show(PLAYER_UNLIKE_TRACK_PLAYLIST, ToastAndroid.SHORT);
+            return state.map((album, index) => {
+                if (album.id === action.payload) {
+                    return {
+                        ...album,
+                        isLiked: false
+                    }
+                }
+                return album;
+            })
         case PLAYER_REMOVE_PLAYLIST:
             ToastAndroid.show(PLAYER_REMOVE_PLAYLIST, ToastAndroid.SHORT);
             return state.filter(({ id }) => id !== action.payload);

@@ -13,12 +13,18 @@ import {
     PLAYER_UNLIKE_MUSIC,
     PLAYER_CREATE_PREVIOUS,
     PLAYER_ADD_TRACK_PREVIOUS,
+    PLAYER_LIKE_TRACK_PREVIOUS,
+    PLAYER_UNLIKE_TRACK_PREVIOUS,
     PLAYER_ADD_BEGIN_PREVIOUS,
     PLAYER_DELETE_PREVIOUS,
     PLAYER_CLEAR_PREVIOUS,
     PLAYER_ADD_CURRENT_TRACK,
+    PLAYER_LIKE_CURRENT_TRACK,
+    PLAYER_UNLIKE_CURRENT_TRACK,
     PLAYER_CREATE_QUEUE,
     PLAYER_ADD_TRACK_QUEUE,
+    PLAYER_LIKE_TRACK_QUEUE,
+    PLAYER_UNLIKE_TRACK_QUEUE,
     PLAYER_ADD_EDITION_QUEUE,
     PLAYER_ADD_BEGIN_QUEUE,
     PLAYER_CHANGE_QUEUE,
@@ -28,9 +34,13 @@ import {
     PLAYER_CREATE_PLAYLIST,
     PLAYER_ADD_EDITION_PLAYLIST,
     PLAYER_ADD_TRACK_PLAYLIST,
+    PLAYER_LIKE_TRACK_PLAYLIST,
+    PLAYER_UNLIKE_TRACK_PLAYLIST,
     PLAYER_REMOVE_PLAYLIST,
-    PLAYER_CLEAR_PLAYLIST
+    PLAYER_CLEAR_PLAYLIST, FETCH_EDITION_SUCCESS
 } from '../actions/types';
+import axios from "axios";
+import {ADDRESS_SERVER} from "../../components/constants/constants";
 
 export const playPlayer = () => dispatch => {
     dispatch({type: PLAYER_PLAY_MUSIC});
@@ -88,6 +98,14 @@ export const addTrackPrevious = (track) => dispatch => {
     dispatch({type: PLAYER_ADD_TRACK_PREVIOUS, payload: track});
 };
 
+export const likeTrackPrevious = (id) => dispatch => {
+    dispatch({type: PLAYER_LIKE_TRACK_PREVIOUS, payload: id});
+};
+
+export const unlikeTrackPrevious = (id) => dispatch => {
+    dispatch({type: PLAYER_UNLIKE_TRACK_PREVIOUS, payload: id});
+};
+
 export const addBeginPrevious = (track) => dispatch => {
     dispatch({type: PLAYER_ADD_BEGIN_PREVIOUS, payload: track});
 }
@@ -104,12 +122,28 @@ export const addCurrent = (track) => dispatch => {
     dispatch({type: PLAYER_ADD_CURRENT_TRACK, payload: track});
 };
 
+export const likeCurrent = () => dispatch => {
+    dispatch({type: PLAYER_LIKE_CURRENT_TRACK});
+};
+
+export const unlikeCurrent = () => dispatch => {
+    dispatch({type: PLAYER_UNLIKE_CURRENT_TRACK});
+};
+
 export const createQueue = (tracks) => dispatch => {
     dispatch({type: PLAYER_CREATE_QUEUE, payload: tracks});
 };
 
 export const addTrackQueue = (track) => dispatch => {
     dispatch({type: PLAYER_ADD_TRACK_QUEUE, payload: track});
+};
+
+export const likeTrackQueue = (id) => dispatch => {
+    dispatch({type: PLAYER_LIKE_TRACK_QUEUE, payload: id});
+};
+
+export const unlikeTrackQueue = (id) => dispatch => {
+    dispatch({type: PLAYER_UNLIKE_TRACK_QUEUE, payload: id});
 };
 
 export const addEditionQueue = (edition) => dispatch => {
@@ -119,6 +153,7 @@ export const addEditionQueue = (edition) => dispatch => {
 export const addBeginQueue = (track) => dispatch => {
     dispatch({type: PLAYER_ADD_BEGIN_QUEUE, payload: track});
 };
+
 export const changeOrderQueue = (tracks) => dispatch => {
     dispatch({type: PLAYER_CHANGE_QUEUE, payload: tracks});
 };
@@ -141,6 +176,14 @@ export const createPlaylist = (tracks) => dispatch => {
 
 export const addTrackPlaylist = (track) => dispatch => {
     dispatch({type: PLAYER_ADD_TRACK_PLAYLIST, payload: track});
+};
+
+export const likeTrackPlaylist = (id) => dispatch => {
+    dispatch({type: PLAYER_LIKE_TRACK_PLAYLIST, payload: id});
+};
+
+export const unlikeTrackPlaylist = (id) => dispatch => {
+    dispatch({type: PLAYER_UNLIKE_TRACK_PLAYLIST, payload: id});
 };
 
 export const addEditionPlaylist = (edition) => dispatch => {

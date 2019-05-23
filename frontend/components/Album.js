@@ -35,8 +35,8 @@ class Album extends Component {
                         style={{ width: width, height: height, borderRadius: 5 }}
                     />
                 </TouchableHighlight>
-                <Text style={styles.titleAlbum}>{title}</Text>
-                <Text style={styles.titlePerformer}>{performer}</Text>
+                <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.titleAlbum, {width: width}]}>{title}</Text>
+                <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.titlePerformer, {width: width}]}>{performer}</Text>
             </View>
         )
     }
@@ -49,7 +49,8 @@ const styles = StyleSheet.create({
     },
     titleAlbum: {
         fontSize: 17,
-        marginTop: 5
+        marginTop: 5,
+        color: '#000'
     },
     titlePerformer: {
         fontSize: 17,

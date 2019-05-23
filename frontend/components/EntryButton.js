@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {View, Text, StyleSheet, TouchableHighlight} from 'react-native';
-import {Image, ListItem} from 'react-native-elements';
+import {Icon, Image, ListItem} from 'react-native-elements';
 import PropTypes from 'prop-types';
 import { Provider, connect } from 'react-redux';
 // import store from "../../../redux/store";
@@ -14,6 +14,7 @@ class EntryButton extends Component {
         nameUser: PropTypes.string.isRequired,
         iconUser: PropTypes.string.isRequired,
         action: PropTypes.func.isRequired,
+        longAction: PropTypes.func.isRequired
     }
 
     componentDidMount()
@@ -23,23 +24,33 @@ class EntryButton extends Component {
 
     render() {
 
-        const { nameUser, iconUser, action } = this.props;
+        const { nameUser, iconUser, action, longAction } = this.props;
 
         return (
 
 
             <View style={styles.container}>
-                <TouchableHighlight onPress={action} underlayColor="#fff">
+                <TouchableHighlight onPress={action} onLongPress={longAction} underlayColor="#fff">
                     <View style={styles.performerContainer}>
                         <View style={styles.rowStyle}>
-                            <Image
-                                source={{uri: iconUser}}
-                                style={{ width: 50, height: 50, borderRadius: 50/2 }}
+                            {!nameUser &&
+                            <Icon name="user-circle-o"
+                                  type="font-awesome"
+                                  size={50}
+                                  color={'#000'}
                             />
+                            }
+                            {nameUser &&
+                                <Image
+                                    source={{uri: iconUser}}
+                                    style={{ width: 50, height: 50, borderRadius: 50/2 }}
+                                />
+                            }
+
                         </View>
                         <View style={styles.rowStyle}>
                             <View style={styles.columnStyle}>
-                                <Text style={styles.title}>{nameUser === undefined && 'Вход'}{nameUser && nameUser}</Text>
+                                <Text style={styles.title}>{!nameUser && 'Вход'}{nameUser && nameUser}</Text>
                             </View>
                         </View>
                     </View>

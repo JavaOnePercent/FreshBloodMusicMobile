@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import {View, Text, Platform, StyleSheet, ActivityIndicator, AsyncStorage, ScrollView, RefreshControl, Dimensions, Alert, Button, ToastAndroid} from 'react-native';
-import { SearchBar } from 'react-native-elements';
 import { Provider, connect } from 'react-redux';
 import store from "../../../redux/store";
 import Post from "../../../components/Post";
 
 import Playlist from "../../../components/Playlist";
 import {getNews, getEdition, clearEdition} from "../../../redux/actions/news";
+import {getLogin} from "../../../redux/actions/auth";
+import {createCurrentProfile, getAlbumsPerformer, getPerformer} from "../../../redux/actions/performer";
 
 class News extends Component {
     constructor(props) {
@@ -19,39 +20,41 @@ class News extends Component {
             indexTable: -1,
 
         }
-        this.hideAlbum = this.hideAlbum.bind(this)
     }
 
     static navigationOptions = {
         headerStyle: {backgroundColor:'#8d6fb9'},
         headerTintColor:'white',
         headerBackTitle: null,
-        title: 'Последние'
+        title: 'Новости'
     };
 
     updateSearch = search => {
         this.setState({ search });
     };
 
-    performer()
+    performer(id)
     {
-        console.log('Twenty One Pilots')
+        if(!this.state.showTable)
+        {
+            this.props.onGetPerformer(id);
+            this.props.onGetAlbumsPerformer(id);
+            this.props.onCreateCurrentProfile(id);
+            this.props.navigation.navigate('Profile')
+        }
     }
 
     edition(l)
     {
         this.isScrolled.setNativeProps({scrollEnabled: false});
+        this.refs['freshIndicator']._nativeRef.setNativeProps({
+            enabled: false
+        });
         return(
             <Playlist
-                iconAlbum={l.image_alb}
-                nameAlbum={l.name_alb}
-                namePerformer={l.name_per}
-                style={l.style}
-                year={l.date_alb.substring(0, 4)}
-                listens={l.numplays_alb}
-                likes={l.rating_alb}
-                hide={this.hideAlbum}
-                tracks={this.props.edition}
+                hide={() => this.hideAlbum(l.id)}
+                idAlbum={l.id}
+                album={this.props.edition}
             />
         )
     }
@@ -68,24 +71,32 @@ class News extends Component {
     }
 
     _renderCancel(i, id) {
-        this.props.onGetEdition(id)
-        this.setState({
-            indexTable: i,
-            showTable: true
-        });
+        if(!this.state.showTable)
+        {
+            this.props.onGetEdition(id)
+            this.setState({
+                indexTable: i,
+                showTable: true
+            });
+        }
     }
 
-    hideAlbum()
+    hideAlbum(id)
     {
         this.isScrolled.setNativeProps({scrollEnabled: true});
-        this.props.onClearEdition()
+        this.refs['freshIndicator']._nativeRef.setNativeProps({
+            enabled: true
+        });
+        this.props.onClearEdition(id)
         this.setState({
-            indexTable: -1
+            indexTable: -1,
+            showTable: false
         });
     }
 
     componentDidMount()
     {
+        this.props.onGetLogin()
         this.props.onGetNews('new')
     }
 
@@ -100,35 +111,13 @@ class News extends Component {
                     <ScrollView
                         refreshControl={
                             <RefreshControl
+                                ref='freshIndicator'
                                 refreshing={this.state.refreshing}
                                 onRefresh={this._onRefresh}
                             />
                         }
                         ref={component => this.isScrolled = component}
                     >
-                    {Platform.OS === 'android' &&
-                    <SearchBar
-                        platform="android"
-                        placeholder="Поиск групп, изданий, треков..."
-                        onChangeText={this.updateSearch}
-                        inputContainerStyle={{backgroundColor: '#fff'}}
-                        value={this.state.search}
-                        lightTheme={true}
-                        round={true}
-                        onCancel={this.kekis}
-                    />}
-                    {Platform.OS === 'ios' &&
-                    <SearchBar
-                        platform="ios"
-                        placeholder="Поиск групп, изданий, треков..."
-                        onChangeText={this.updateSearch}
-                        inputContainerStyle={{backgroundColor: '#fff'}}
-                        value={this.state.search}
-                        lightTheme={true}
-                        round={true}
-                        cancelButtonProps={{color: '#8d6fb9'}}
-                        onCancel={this.kekis}
-                    />}
                     {
                         this.props.news.map((l, i) => (
                             <Post performer={l.name_per}
@@ -137,10 +126,10 @@ class News extends Component {
                                   description={l.about_alb}
                                   genre={l.genre}
                                   style={l.style}
-                                  years={l.date_alb.substring(0, 4)}
+                                  years={l.date_alb.substring(7, 11)}
                                   iconAlbum={l.image_alb}
                                   title={l.name_alb}
-                                  showPerformer={this.performer}
+                                  showPerformer={() => this.performer(l.per_id)}
                                   showTracks={() => this._renderCancel(i, l.id.toString())}
                             />
                             ))
@@ -185,8 +174,20 @@ export default connect(
         onGetEdition: (id) => {
             dispatch(getEdition(id));
         },
-        onClearEdition: () => {
-            dispatch(clearEdition());
+        onGetLogin: () => {
+            dispatch(getLogin());
+        },
+        onClearEdition: (id) => {
+            dispatch(clearEdition(id));
+        },
+        onCreateCurrentProfile: (id) => {
+            dispatch(createCurrentProfile(id));
+        },
+        onGetPerformer: (id) => {
+            dispatch(getPerformer(id));
+        },
+        onGetAlbumsPerformer: (id) => {
+            dispatch(getAlbumsPerformer(id));
         }
     })
 )(News)

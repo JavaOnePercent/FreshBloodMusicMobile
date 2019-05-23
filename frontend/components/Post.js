@@ -83,17 +83,18 @@ const styles = StyleSheet.create({
     },
     header: {
         fontSize: 16,
-        paddingLeft: 15
+        paddingLeft: 15,
+        color: '#000'
     },
     description: {
         padding: 15,
         fontSize: 16,
+        color: '#000'
     },
     performerContainer: {
-        paddingLeft: 15,
+        padding: 15,
         flexDirection: 'row',
-        flexWrap: 'wrap',
-        paddingBottom: 15
+        flexWrap: 'wrap'
     },
     rowStyle: {
         flexDirection: 'row',
