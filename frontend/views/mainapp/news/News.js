@@ -8,6 +8,9 @@ import Playlist from "../../../components/Playlist";
 import {getNews, getEdition, clearEdition} from "../../../redux/actions/news";
 import {getLogin} from "../../../redux/actions/auth";
 import {createCurrentProfile, getAlbumsPerformer, getPerformer} from "../../../redux/actions/performer";
+import {getPerformers} from "../../../redux/actions/charts";
+import { createQueueTrend } from "../../../redux/actions/player";
+import { getNextTrack } from "../../../redux/actions/radio";
 
 class News extends Component {
     constructor(props) {
@@ -98,6 +101,9 @@ class News extends Component {
     {
         this.props.onGetLogin()
         this.props.onGetNews('new')
+        this.props.onGetPerformers()
+        this.props.onCreateQueueTrend()
+        this.props.onGetNextTrack()
     }
 
     componentWillUnmount(){
@@ -188,6 +194,15 @@ export default connect(
         },
         onGetAlbumsPerformer: (id) => {
             dispatch(getAlbumsPerformer(id));
+        },
+        onGetPerformers: () => {
+            dispatch(getPerformers());
+        },
+        onCreateQueueTrend: () => {
+            dispatch(createQueueTrend());
+        },
+        onGetNextTrack: () => {
+            dispatch(getNextTrack());
         }
     })
 )(News)

@@ -15,7 +15,7 @@ import Edition from "../../../components/Edition";
 import {ADDRESS_SERVER} from "../../../components/constants/constants";
 import {SearchBar} from "react-native-elements";
 
-class Podcasts extends Component {
+class Search extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -128,4 +128,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default connect()(Podcasts)
+export default connect()(Search)

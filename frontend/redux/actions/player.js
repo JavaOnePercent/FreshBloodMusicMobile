@@ -9,8 +9,6 @@ import {
     PLAYER_UNREPEAT_MUSIC,
     PLAYER_REPEAT_MUSIC,
     PLAYER_REPEAT_ONE_MUSIC,
-    PLAYER_LIKE_MUSIC,
-    PLAYER_UNLIKE_MUSIC,
     PLAYER_CREATE_PREVIOUS,
     PLAYER_ADD_TRACK_PREVIOUS,
     PLAYER_LIKE_TRACK_PREVIOUS,
@@ -37,7 +35,7 @@ import {
     PLAYER_LIKE_TRACK_PLAYLIST,
     PLAYER_UNLIKE_TRACK_PLAYLIST,
     PLAYER_REMOVE_PLAYLIST,
-    PLAYER_CLEAR_PLAYLIST, FETCH_EDITION_SUCCESS
+    PLAYER_CLEAR_PLAYLIST
 } from '../actions/types';
 import axios from "axios";
 import {ADDRESS_SERVER} from "../../components/constants/constants";
@@ -82,14 +80,6 @@ export const repeatOneMusic = () => dispatch => {
     dispatch({type: PLAYER_REPEAT_ONE_MUSIC});
 };
 
-export const unlikeMusic = () => dispatch => {
-    dispatch({type: PLAYER_UNLIKE_MUSIC});
-};
-
-export const likeMusic = () => dispatch => {
-    dispatch({type: PLAYER_LIKE_MUSIC});
-};
-
 export const createPrevious = (tracks) => dispatch => {
     dispatch({type: PLAYER_CREATE_PREVIOUS, payload: tracks});
 };
@@ -132,6 +122,35 @@ export const unlikeCurrent = () => dispatch => {
 
 export const createQueue = (tracks) => dispatch => {
     dispatch({type: PLAYER_CREATE_QUEUE, payload: tracks});
+};
+
+
+export const createQueueTrend = () => async dispatch => {
+    axios.get(ADDRESS_SERVER + '/api/tracks', {
+        params: {
+            filter: 'popular',
+            limit: 20,
+            interval: 7
+        }
+    }).then(function (response) {
+        let data = response.data;
+        let queue = []
+        for(let i = 0; i < data.length; i++)
+        {
+            data[i].image_alb = ADDRESS_SERVER + data[i].image_alb.substring(25)
+            data[i].audio_trc = ADDRESS_SERVER + data[i].audio_trc.substring(25)
+
+            queue.push({id: data[i].id, idPerformer: data[i].id_per, performer: data[i].name_per, cover: data[i].image_alb,
+                title: data[i].name_trc, audio: data[i].audio_trc, duration: data[i].duration,
+                isLiked: data[i].is_liked})
+        }
+
+        dispatch({type: PLAYER_CREATE_QUEUE, payload: queue});
+        dispatch({type: PLAYER_CREATE_PLAYLIST, payload: queue});
+    })
+        .catch(function (error) {
+
+        });
 };
 
 export const addTrackQueue = (track) => dispatch => {

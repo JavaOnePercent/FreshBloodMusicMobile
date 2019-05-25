@@ -11,6 +11,7 @@ import {
     TRACK_INCREMENT_LISTENING
 } from '../actions/types';
 import {ToastAndroid} from "react-native";
+import {FETCH_CHARTS_SUCCESS} from "./types";
 
 export const getNews = (sort) => async dispatch => {
     axios.get(ADDRESS_SERVER + '/api/albums', {
@@ -115,6 +116,43 @@ export const incrementListening = (id) => async dispatch => {
     axios.get(ADDRESS_SERVER + '/api/tracks/' + id
     ).then(function (response) {
         dispatch({type: TRACK_INCREMENT_LISTENING, payload: id});
+    })
+        .catch(function (error) {
+
+        });
+};
+
+export const getTrends = (interval) => async dispatch => {
+    axios.get(ADDRESS_SERVER + '/api/tracks', {
+        params: {
+            filter: 'popular',
+            limit: 20,
+            interval: interval
+        }
+    }).then(function (response) {
+        let data = response.data;
+        for(let i = 0; i < data.length; i++)
+        {
+            data[i].image_alb = ADDRESS_SERVER + data[i].image_alb.substring(25)
+            data[i].audio_trc = ADDRESS_SERVER + data[i].audio_trc.substring(25)
+        }
+        let trends = {}
+        if(interval === 3)
+        {
+            trends = {id: -1, title: 'TOP 20', cover: ADDRESS_SERVER + "/media/albums/-1/trend.png",
+                performer: 'В тренде', style: '', year: '', tracks: data}
+        }
+        else if(interval === 7)
+        {
+            trends = {id: -2, title: 'TOP 20', cover: ADDRESS_SERVER + "/media/albums/-2/week.png",
+                performer: 'За неделю', style: '', year: '', tracks: data}
+        }
+        else if(interval === 31)
+        {
+            trends = {id: -3, title: 'TOP 20', cover: ADDRESS_SERVER + "/media/albums/-3/month.png",
+                performer: 'За месяц', style: '', year: '', tracks: data}
+        }
+        dispatch({type: FETCH_EDITION_SUCCESS, payload: trends});
     })
         .catch(function (error) {
 

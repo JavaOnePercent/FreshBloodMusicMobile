@@ -9,8 +9,6 @@ import {
     PLAYER_UNREPEAT_MUSIC,
     PLAYER_REPEAT_MUSIC,
     PLAYER_REPEAT_ONE_MUSIC,
-    PLAYER_LIKE_MUSIC,
-    PLAYER_UNLIKE_MUSIC,
     PLAYER_CREATE_PREVIOUS,
     PLAYER_ADD_TRACK_PREVIOUS,
     PLAYER_LIKE_TRACK_PREVIOUS,
@@ -99,20 +97,6 @@ export function repeat (state = 'unrepeat', action) {
         case PLAYER_REPEAT_ONE_MUSIC:
             ToastAndroid.show(PLAYER_REPEAT_ONE_MUSIC, ToastAndroid.SHORT);
             return 'repeat-one';
-        default:
-            return state;
-    }
-}
-
-export function playerLike (state = false, action) {
-    switch(action.type)
-    {
-        case PLAYER_UNLIKE_MUSIC:
-            ToastAndroid.show(PLAYER_UNLIKE_MUSIC, ToastAndroid.SHORT);
-            return false;
-        case PLAYER_LIKE_MUSIC:
-            ToastAndroid.show(PLAYER_LIKE_MUSIC, ToastAndroid.SHORT);
-            return true;
         default:
             return state;
     }

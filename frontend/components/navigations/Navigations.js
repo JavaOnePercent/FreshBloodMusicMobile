@@ -21,7 +21,7 @@ import Recommendations from "../../views/mainapp/favorites/Recommendations";
 import MyPlaylists from "../../views/mainapp/favorites/MyPlaylists";
 import Notifications from "../../views/mainapp/favorites/Notifications";
 
-import Podcasts from "../../views/mainapp/podcasts/Podcasts";
+import Search from "../../views/mainapp/search/Search";
 
 import Radio from "../../views/mainapp/radio/Radio";
 
@@ -51,9 +51,9 @@ const TabFavoritesStack = createStackNavigator(
     }
 );
 
-const TabPodcastsStack = createStackNavigator(
+const TabSearchStack = createStackNavigator(
     {
-        Podcasts: { screen: Podcasts },
+        Search: { screen: Search },
         Profile: {screen: Profile},
     }
 );
@@ -125,7 +125,7 @@ const MainAppStack = createBottomTabNavigator({
                     />
                 ),
             })},
-        Podcasts: { screen: TabPodcastsStack,
+        Search: { screen: TabSearchStack,
             navigationOptions: ({navigation}) => ({
                 tabBarLabel: 'Поиск',
                 tabBarIcon: ({tintColor}) => (

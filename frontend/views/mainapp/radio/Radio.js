@@ -1,9 +1,21 @@
 import React, { Component } from 'react';
-import {View, Text, StyleSheet, ActivityIndicator, AsyncStorage, RefreshControl, ScrollView} from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    ActivityIndicator,
+    AsyncStorage,
+    RefreshControl,
+    ScrollView,
+    Dimensions,
+    ToastAndroid
+} from 'react-native';
 import { Provider, connect } from 'react-redux';
 import store from "../../../redux/store";
-import Station from "../../../components/Station";
 import {ADDRESS_SERVER} from "../../../components/constants/constants";
+import Album from "../../../components/Album";
+import {getNextTrack} from "../../../redux/actions/radio";
+import {createQueue, releasePlayer} from "../../../redux/actions/player";
 
 class Radio extends Component {
     constructor(props) {
@@ -12,35 +24,11 @@ class Radio extends Component {
             editionArray: [
                 {
                     title: 'Всё и сразу',
-                    iconAlbum: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-                    action: () => alert('Всё и сразу')
-                },
-                {
-                    title: 'Рок',
-                    iconAlbum: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-                    action: () => alert('Рок')
-                },
-                {
-                    title: 'Hip-Hop',
-                    iconAlbum: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-                    action: () => alert('Hip-Hop')
-                },
-                {
-                    title: 'Альтернатива',
-                    iconAlbum: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-                    action: () => alert('Альтернатива')
-                },
-                {
-                    title: 'Синти-поп',
-                    iconAlbum: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-                    action: () => alert('Синти-поп')
-                },
-                {
-                    title: 'Металл',
-                    iconAlbum: ADDRESS_SERVER + '/media/albums/2/logo.jpg',
-                    action: () => alert('Металл')
+                    iconAlbum: ADDRESS_SERVER + "/media/albums/0/radio.png",
+                    action: () => this.playRadio()
                 }
-            ]
+            ],
+            refreshing: false,
         }
     }
 
@@ -56,12 +44,52 @@ class Radio extends Component {
 
     }
 
+    _refresh = async() => {
+
+    }
+
+    _onRefresh = () => {
+        this.setState({refreshing: true});
+        this._refresh().then(() => {
+            this.setState({refreshing: false});
+        });
+    }
+
+    playRadio()
+    {
+        this.props.onPressReleasePlayButton(this.props.radioNext.audio);
+        this.props.onCreateQueue([this.props.radioNext]);
+        this.props.onGetNextTrack();
+    }
+
     render() {
         return (
             <Provider store={store}>
-                    <View style={styles.container}>
-                        <Station titleList={'Радиостанции'} editionArray={this.state.editionArray} />
-                    </View>
+                <View style={styles.container}>
+                    <ScrollView
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={this.state.refreshing}
+                                onRefresh={this._onRefresh}
+                            />
+                        }
+                    >
+                        <Text style={styles.title}>Радиостанции</Text>
+                        <View style={styles.albumContainer}>
+                            <View style={styles.performerContainer}>
+                                {this.state.editionArray.map((l, i) => (
+                                    <View style={styles.rowStyle}>
+                                        <View style={styles.columnStyle}>
+                                            <Album title={l.title} performer={null} iconAlbum={l.iconAlbum} showTracks={l.action} width={150} height={150}/>
+                                        </View>
+                                    </View>
+                                ))}
+                            </View>
+                        </View>
+                        <View style={styles.bottom}>
+                        </View>
+                    </ScrollView>
+                </View>
             </Provider>
         )
     }
@@ -71,7 +99,45 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff'
+    },
+    title: {
+        padding: 20,
+        fontSize: 24,
+        color: 'grey'
+    },
+    albumContainer: {
+        flexWrap: 'wrap',
+        marginLeft: Dimensions.get('window').width - 340
+    },
+    performerContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+    },
+    rowStyle: {
+        flexDirection: 'row',
+        flexWrap: 'wrap'
+    },
+    columnStyle: {
+        flexDirection: 'column',
+        marginHorizontal: 5
+    },
+    bottom: {
+        height: 65,
+        backgroundColor: '#fff'
     }
 });
 
-export default connect()(Radio)
+export default connect(
+    state => ({radioNext: state.radioNext, edition: state.edition}),
+    dispatch => ({
+        onPressReleasePlayButton: (audio) => {
+            dispatch(releasePlayer(audio));
+        },
+        onCreateQueue: (tracks) => {
+            dispatch(createQueue(tracks));
+        },
+        onGetNextTrack: () => {
+            dispatch(getNextTrack());
+        }
+    })
+)(Radio)

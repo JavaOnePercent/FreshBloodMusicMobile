@@ -128,10 +128,6 @@ class AppMusic extends React.Component {
             this.props.onAddCurrent(track)
             this.props.onDeleteTrackQueue()
         }
-        else if(this.props.queue.length === 0 && track === null && this.sound === undefined)
-        {
-            ToastAndroid.show('Найди сначала музыку для плеера', ToastAndroid.SHORT);
-        }
 
         if(track !== null)
         {

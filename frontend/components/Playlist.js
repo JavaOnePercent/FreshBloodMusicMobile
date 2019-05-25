@@ -46,7 +46,7 @@ class Playlist extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            idTrack: -1,
+            idTrack: 0,
             indexTrack: -1
         }
     }
@@ -82,92 +82,192 @@ class Playlist extends Component {
 
     addPlaylist(edition)
     {
-        if(this.state.idTrack !== -1)
+        if(edition.tracks.length === 0)
         {
-            let tracks = edition.tracks.filter(({ id }) => id === this.state.idTrack)[0]
-            this.props.onAddTrackQueue({id: this.state.idTrack, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
-                title: tracks.name_trc, audio: tracks.audio_trc, duration: tracks.duration,
-                isLiked: tracks.is_liked})
-            this.props.onAddTrackPlaylist({id: this.state.idTrack, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
-                title: tracks.name_trc, audio: tracks.audio_trc, duration: tracks.duration,
-                isLiked: tracks.is_liked})
+            return;
         }
-        else
+        if(this.props.idAlbum > 0)
         {
-            let playlist = []
-            edition.tracks.map((l, i) => (
-                playlist.push({id: l.id, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
-                    title: l.name_trc, audio: l.audio_trc, duration: l.duration,
-                    isLiked: l.is_liked})
-            ))
-            this.props.onAddEditionQueue(playlist)
-            this.props.onAddEditionPlaylist(playlist)
+            if(this.state.idTrack !== 0)
+            {
+                let tracks = edition.tracks.filter(({ id }) => id === this.state.idTrack)[0]
+                this.props.onAddTrackQueue({id: this.state.idTrack, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
+                    title: tracks.name_trc, audio: tracks.audio_trc, duration: tracks.duration,
+                    isLiked: tracks.is_liked})
+                this.props.onAddTrackPlaylist({id: this.state.idTrack, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
+                    title: tracks.name_trc, audio: tracks.audio_trc, duration: tracks.duration,
+                    isLiked: tracks.is_liked})
+            }
+            else
+            {
+                let playlist = []
+                edition.tracks.map((l, i) => (
+                    playlist.push({id: l.id, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
+                        title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                        isLiked: l.is_liked})
+                ))
+                this.props.onAddEditionQueue(playlist)
+                this.props.onAddEditionPlaylist(playlist)
+            }
         }
+        else if(this.props.idAlbum < 0)
+        {
+            if(this.state.idTrack !== 0)
+            {
+                let tracks = edition.tracks.filter(({ id }) => id === this.state.idTrack)[0]
+                this.props.onAddTrackQueue({id: this.state.idTrack, idPerformer: tracks.id_per, performer: tracks.name_per, cover: tracks.image_alb,
+                    title: tracks.name_trc, audio: tracks.audio_trc, duration: tracks.duration,
+                    isLiked: tracks.is_liked})
+                this.props.onAddTrackPlaylist({id: this.state.idTrack, idPerformer: tracks.id_per, performer: tracks.name_per, cover: tracks.image_alb,
+                    title: tracks.name_trc, audio: tracks.audio_trc, duration: tracks.duration,
+                    isLiked: tracks.is_liked})
+            }
+            else
+            {
+                let playlist = []
+                edition.tracks.map((l, i) => (
+                    playlist.push({id: l.id, idPerformer: l.id_per, performer: l.name_per, cover: l.image_alb,
+                        title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                        isLiked: l.is_liked})
+                ))
+                this.props.onAddEditionQueue(playlist)
+                this.props.onAddEditionPlaylist(playlist)
+            }
+        }
+
     }
 
     back()
     {
         this.setState({
-            idTrack: -1,
+            idTrack: 0,
             indexTrack: -1
         });
     }
 
     play(index, edition)
     {
-        this.props.onCreateCommonMusic();
-        if(index)
+        if(edition.tracks.length === 0)
         {
-            let prev = []
-            let queue = []
-            let playlist = []
-            edition.tracks.map((l, i) =>
-                {
-                    if(i < index)
+            return;
+        }
+        this.props.onCreateCommonMusic();
+        if(this.props.idAlbum > 0)
+        {
+            if(index)
+            {
+                let prev = []
+                let queue = []
+                let playlist = []
+                edition.tracks.map((l, i) =>
                     {
-                        prev.push({id: l.id, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
+                        if(i < index)
+                        {
+                            prev.push({id: l.id, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
+                                title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                                isLiked: l.is_liked})
+                        }
+                        else if(i >= index)
+                        {
+                            queue.push({id: l.id, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
+                                title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                                isLiked: l.is_liked})
+                        }
+                        playlist.push({id: l.id, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
                             title: l.name_trc, audio: l.audio_trc, duration: l.duration,
                             isLiked: l.is_liked})
                     }
-                    else if(i >= index)
-                    {
-                        queue.push({id: l.id, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
-                            title: l.name_trc, audio: l.audio_trc, duration: l.duration,
-                            isLiked: l.is_liked})
-                    }
-                    playlist.push({id: l.id, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
+                )
+                this.props.onCreatePrevious(prev)
+                this.props.onCreateQueue(queue)
+                this.props.onCreatePlaylist(playlist)
+                this.props.onPressReleasePlayButton(edition.tracks[index].audio_trc);
+            }
+            else
+            {
+                let queue = []
+                edition.tracks.map((l, i) => (
+                    queue.push({id: l.id, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
                         title: l.name_trc, audio: l.audio_trc, duration: l.duration,
                         isLiked: l.is_liked})
-                }
-            )
-            this.props.onCreatePrevious(prev)
-            this.props.onCreateQueue(queue)
-            this.props.onCreatePlaylist(playlist)
-            this.props.onPressReleasePlayButton(edition.tracks[index].audio_trc);
+                ))
+                this.props.onCreateQueue(queue)
+                this.props.onCreatePlaylist(queue)
+                this.props.onPressReleasePlayButton(edition.tracks[0].audio_trc);
+            }
         }
-        else
+        else if(this.props.idAlbum < 0)
         {
-            let queue = []
-            edition.tracks.map((l, i) => (
-                queue.push({id: l.id, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
-                    title: l.name_trc, audio: l.audio_trc, duration: l.duration,
-                    isLiked: l.is_liked})
-            ))
-            this.props.onCreateQueue(queue)
-            this.props.onCreatePlaylist(queue)
-            this.props.onPressReleasePlayButton(edition.tracks[0].audio_trc);
+            if(index)
+            {
+                let prev = []
+                let queue = []
+                let playlist = []
+                edition.tracks.map((l, i) =>
+                    {
+                        if(i < index)
+                        {
+                            prev.push({id: l.id, idPerformer: l.id_per, performer: l.name_per, cover: l.image_alb,
+                                title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                                isLiked: l.is_liked})
+                        }
+                        else if(i >= index)
+                        {
+                            queue.push({id: l.id, idPerformer: l.id_per, performer: l.name_per, cover: l.image_alb,
+                                title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                                isLiked: l.is_liked})
+                        }
+                        playlist.push({id: l.id, idPerformer: l.id_per, performer: l.name_per, cover: l.image_alb,
+                            title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                            isLiked: l.is_liked})
+                    }
+                )
+                this.props.onCreatePrevious(prev)
+                this.props.onCreateQueue(queue)
+                this.props.onCreatePlaylist(playlist)
+                this.props.onPressReleasePlayButton(edition.tracks[index].audio_trc);
+            }
+            else
+            {
+                let queue = []
+                edition.tracks.map((l, i) => (
+                    queue.push({id: l.id, idPerformer: l.id_per, performer: l.name_per, cover: l.image_alb,
+                        title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                        isLiked: l.is_liked})
+                ))
+                this.props.onCreateQueue(queue)
+                this.props.onCreatePlaylist(queue)
+                this.props.onPressReleasePlayButton(edition.tracks[0].audio_trc);
+            }
         }
     }
 
     randomPlay(edition)
     {
+        if(edition.tracks.length === 0)
+        {
+            return;
+        }
         this.props.onCreateRandomMusic();
         let queue = []
-        edition.tracks.map((l, i) => (
-            queue.push({id: l.id, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
-                title: l.name_trc, audio: l.audio_trc, duration: l.duration,
-                isLiked: l.is_liked})
-        ))
+        if(this.props.idAlbum > 0)
+        {
+            edition.tracks.map((l, i) => (
+                queue.push({
+                    id: l.id, idPerformer: edition.idPerformer, performer: edition.performer, cover: edition.cover,
+                    title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                    isLiked: l.is_liked
+                })
+            ))
+        }
+        else if(this.props.idAlbum < 0)
+        {
+            edition.tracks.map((l, i) => (
+                queue.push({id: l.id, idPerformer: l.id_per, performer: l.name_per, cover: l.image_alb,
+                    title: l.name_trc, audio: l.audio_trc, duration: l.duration,
+                    isLiked: l.is_liked})
+            ))
+        }
         this.props.onCreatePlaylist(queue);
         let randomQueue = shuffleListTrack(queue.slice());
         this.props.onCreateQueue(randomQueue);
@@ -192,6 +292,10 @@ class Playlist extends Component {
 
     albumLike(edition)
     {
+        if(edition.tracks.length === 0)
+        {
+            return;
+        }
        if(this.props.auth.id !== -1 && this.props.auth.id !== 0)
        {
            this.props.onAddLikeEdition(edition.id)
@@ -200,6 +304,10 @@ class Playlist extends Component {
 
     albumUnlike(edition)
     {
+        if(edition.tracks.length === 0)
+        {
+            return;
+        }
         if(this.props.auth.id !== -1 && this.props.auth.id !== 0)
         {
             this.props.onDeleteLikeEdition(edition.id)
@@ -264,9 +372,25 @@ class Playlist extends Component {
                 <View style={styles.container}>
                     <View style={styles.background}>
                         {
-                            edition !== undefined &&
+                            edition !== undefined && this.state.idTrack === 0 &&
                             <Image
                                 source={{uri: edition.cover}}
+                                style={{opacity: 0.6, height: 135, width: 300, resizeMode: 'cover'}}
+                                blurRadius={3}
+                            />
+                        }
+                        {
+                            edition !== undefined && this.state.idTrack !== 0 && this.props.idAlbum > 0 &&
+                            <Image
+                                source={{uri: edition.cover}}
+                                style={{opacity: 0.6, height: 135, width: 300, resizeMode: 'cover'}}
+                                blurRadius={3}
+                            />
+                        }
+                        {
+                            edition !== undefined && this.state.idTrack !== 0 && this.props.idAlbum < 0 &&
+                            <Image
+                                source={{uri: edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].image_alb}}
                                 style={{opacity: 0.6, height: 135, width: 300, resizeMode: 'cover'}}
                                 blurRadius={3}
                             />
@@ -283,7 +407,7 @@ class Playlist extends Component {
                             </TouchableHighlight>
                         </View>
                         {
-                            this.state.idTrack === -1 &&
+                            this.state.idTrack === 0 &&
                             edition === undefined &&
                             <View style={[styles.indicator, {height: 250}]}>
                                 <ActivityIndicator color={'#8d6fb9'}/>
@@ -294,25 +418,42 @@ class Playlist extends Component {
                             <View style={{height: 345}}>
                                 <View style={styles.listItem}>
                                     <View style={styles.rowStyle}>
-                                        <Image
-                                            source={{uri: edition.cover}}
-                                            style={{width: 100, height: 100, borderRadius: 5}}
-                                        />
+                                        {
+                                            this.state.idTrack === 0 &&
+                                            <Image
+                                                source={{uri: edition.cover}}
+                                                style={{width: 100, height: 100, borderRadius: 5}}
+                                            />
+                                        }
+                                        {
+                                            this.state.idTrack !== 0 && this.props.idAlbum > 0 &&
+                                            <Image
+                                                source={{uri: edition.cover}}
+                                                style={{width: 100, height: 100, borderRadius: 5}}
+                                            />
+                                        }
+                                        {
+                                            this.state.idTrack !== 0 && this.props.idAlbum < 0 &&
+                                            <Image
+                                                source={{uri: edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].image_alb}}
+                                                style={{width: 100, height: 100, borderRadius: 5}}
+                                            />
+                                        }
                                     </View>
                                     <View style={styles.rowStyle}>
                                         {
-                                            this.state.idTrack === -1 &&
+                                            this.state.idTrack === 0 &&
                                             <View style={styles.columnStyle}>
                                                 <Text numberOfLines={2} ellipsizeMode="tail"
                                                       style={styles.titleTrack}>{edition.title}</Text>
                                                 <Text numberOfLines={1} ellipsizeMode="tail"
                                                       style={styles.titlePerformer}>{edition.performer}</Text>
                                                 <Text numberOfLines={1} ellipsizeMode="tail"
-                                                      style={styles.titlePerformer}>{edition.style + ' (' + edition.year + ')'}</Text>
+                                                      style={styles.titlePerformer}>{edition.style + ' ' + edition.year}</Text>
                                             </View>
                                         }
                                         {
-                                            this.state.idTrack !== -1 &&
+                                            this.props.idAlbum > 0 && this.state.idTrack !== 0 &&
                                             <View style={styles.columnStyle}>
                                                 <Text numberOfLines={2} ellipsizeMode="tail"
                                                       style={styles.titleTrack}>{edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].name_trc}</Text>
@@ -322,11 +463,22 @@ class Playlist extends Component {
                                                       style={styles.titlePerformer}>{edition.title}</Text>
                                             </View>
                                         }
+                                        {
+                                            this.props.idAlbum < 0 && this.state.idTrack !== 0 &&
+                                            <View style={styles.columnStyle}>
+                                                <Text numberOfLines={2} ellipsizeMode="tail"
+                                                      style={styles.titleTrack}>{edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].name_trc}</Text>
+                                                <Text numberOfLines={1} ellipsizeMode="tail"
+                                                      style={styles.titlePerformer}>{edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].name_per}</Text>
+                                                <Text numberOfLines={1} ellipsizeMode="tail"
+                                                      style={styles.titlePerformer}>{edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].name_alb}</Text>
+                                            </View>
+                                        }
                                     </View>
                                 </View>
                                 <View style={styles.buttonPanel}>
                                     {
-                                        this.state.idTrack === -1 &&
+                                        this.state.idTrack === 0 &&
                                         <View style={styles.buttonRowStyle}>
                                             <TouchableHighlight style={styles.button} onPress={() => this.randomPlay(edition)}
                                                                 underlayColor="#fff">
@@ -339,7 +491,7 @@ class Playlist extends Component {
                                         </View>
                                     }
                                     {
-                                        this.state.idTrack !== -1 &&
+                                        this.state.idTrack !== 0 &&
                                         <View style={styles.buttonRowStyle}>
                                             <TouchableHighlight style={styles.button} onPress={() => this.back()}
                                                                 underlayColor="#fff">
@@ -352,7 +504,7 @@ class Playlist extends Component {
                                         </View>
                                     }
                                     {
-                                        this.state.idTrack === -1 &&
+                                        this.state.idTrack === 0 &&
                                         <View style={styles.buttonRowStyle}>
                                             <TouchableHighlight style={styles.button} onPress={() => this.play(null, edition)}
                                                                 underlayColor="#fff">
@@ -365,7 +517,7 @@ class Playlist extends Component {
                                         </View>
                                     }
                                     {
-                                        this.state.idTrack !== -1 && this.state.idTrack !== this.props.current.id &&
+                                        this.state.idTrack !== 0 && this.state.idTrack !== this.props.current.id &&
                                         <View style={styles.buttonRowStyle}>
                                             <TouchableHighlight style={styles.button}
                                                                 onPress={() => this.play(this.state.indexTrack, edition)}
@@ -379,7 +531,7 @@ class Playlist extends Component {
                                         </View>
                                     }
                                     {
-                                        this.state.idTrack !== -1 && this.state.idTrack === this.props.current.id && this.props.isPlay === 'pause' &&
+                                        this.state.idTrack !== 0 && this.state.idTrack === this.props.current.id && this.props.isPlay === 'pause' &&
                                         <View style={styles.buttonRowStyle}>
                                             <TouchableHighlight style={styles.button} onPress={() => this.playCurrent()}
                                                                 underlayColor="#fff">
@@ -392,7 +544,7 @@ class Playlist extends Component {
                                         </View>
                                     }
                                     {
-                                        this.state.idTrack !== -1 && this.state.idTrack === this.props.current.id && this.props.isPlay !== 'pause' &&
+                                        this.state.idTrack !== 0 && this.state.idTrack === this.props.current.id && this.props.isPlay !== 'pause' &&
                                         <View style={styles.buttonRowStyle}>
                                             <TouchableHighlight style={styles.button} onPress={() => this.pauseCurrent()}
                                                                 underlayColor="#fff">
@@ -404,7 +556,7 @@ class Playlist extends Component {
                                             </TouchableHighlight>
                                         </View>
                                     }
-                                    {this.state.idTrack === -1 && edition.isLiked === false &&
+                                    {this.state.idTrack === 0 && edition.isLiked === false &&
                                     <View style={styles.buttonRowStyle}>
                                         <TouchableHighlight style={styles.button} onPress={() => this.albumLike(edition)}
                                                             underlayColor="#fff">
@@ -416,7 +568,7 @@ class Playlist extends Component {
                                         </TouchableHighlight>
                                     </View>
                                     }
-                                    {this.state.idTrack === -1 && edition.isLiked === true &&
+                                    {this.state.idTrack === 0 && edition.isLiked === true &&
                                     <View style={styles.buttonRowStyle}>
                                         <TouchableHighlight style={styles.button} onPress={() => this.albumUnlike(edition)}
                                                             underlayColor="#fff">
@@ -428,7 +580,7 @@ class Playlist extends Component {
                                         </TouchableHighlight>
                                     </View>
                                     }
-                                    {this.state.idTrack !== -1 && edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].is_liked === false &&
+                                    {this.state.idTrack !== 0 && edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].is_liked === false &&
                                     <View style={styles.buttonRowStyle}>
                                         <TouchableHighlight style={styles.button} onPress={() => this.trackLike()} underlayColor="#fff">
                                             <Icon name="ios-heart-empty"
@@ -439,7 +591,7 @@ class Playlist extends Component {
                                         </TouchableHighlight>
                                     </View>
                                     }
-                                    {this.state.idTrack !== -1 && edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].is_liked === true &&
+                                    {this.state.idTrack !== 0 && edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].is_liked === true &&
                                     <View style={styles.buttonRowStyle}>
                                         <TouchableHighlight style={styles.button} onPress={() => this.trackUnlike()} underlayColor="#fff">
                                             <Icon name="ios-heart"
@@ -463,7 +615,7 @@ class Playlist extends Component {
                                 </View>
                                 <ScrollView showsVerticalScrollIndicator={false}>
                                     {
-                                        this.state.idTrack === -1 &&
+                                        this.state.idTrack === 0 &&
                                         edition.tracks.map((l, i) => (
                                             <View>
                                                 {
@@ -526,7 +678,7 @@ class Playlist extends Component {
                                         ))
                                     }
                                     {
-                                        this.state.idTrack !== -1 &&
+                                        this.state.idTrack !== 0 &&
                                         <View>
                                             <TouchableHighlight onPress={() => {
                                                 ToastAndroid.show(edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].name_trc, ToastAndroid.SHORT)
@@ -597,7 +749,7 @@ class Playlist extends Component {
                                 </ScrollView>
                                 <View style={{marginBottom: 5, height: 40, justifyContent: 'center'}}>
                                     {
-                                        this.state.idTrack !== -1 &&
+                                        this.state.idTrack !== 0 &&
                                         <View>
                                             <Text style={styles.text}>{edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].numplays_trc + ' прослушиваний'}</Text>
                                             <Text
@@ -605,7 +757,7 @@ class Playlist extends Component {
                                         </View>
                                     }
                                     {
-                                        this.state.idTrack === -1 &&
+                                        this.state.idTrack === 0 && edition.id > 0 &&
                                         <View>
                                             <Text style={styles.text}>{edition.likes + ' пользователям понравилось'}</Text>
                                         </View>
