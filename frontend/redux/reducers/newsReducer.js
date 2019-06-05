@@ -17,10 +17,10 @@ export function news (state = [], action) {
     switch(action.type)
     {
         case FETCH_NEWS_SUCCESS:
-            ToastAndroid.show(FETCH_NEWS_SUCCESS, ToastAndroid.SHORT);
+            // ToastAndroid.show(FETCH_NEWS_SUCCESS, ToastAndroid.SHORT);
             return action.payload;
         case FETCH_NEWS_FAIL:
-            ToastAndroid.show(FETCH_NEWS_FAIL, ToastAndroid.SHORT);
+            // ToastAndroid.show(FETCH_NEWS_FAIL, ToastAndroid.SHORT);
             return state;
         default:
             return state;
@@ -33,7 +33,7 @@ export function edition (state = [], action) {
         case FETCH_EDITION_SUCCESS:
             if(state.length === 0 || !state)
             {
-                ToastAndroid.show(FETCH_EDITION_SUCCESS, ToastAndroid.SHORT);
+                // ToastAndroid.show(FETCH_EDITION_SUCCESS, ToastAndroid.SHORT);
                 return [ action.payload ];
             }
             else
@@ -41,13 +41,13 @@ export function edition (state = [], action) {
                 return [ ...state, action.payload];
             }
         case FETCH_EDITION_FAIL:
-            ToastAndroid.show(FETCH_EDITION_FAIL, ToastAndroid.SHORT);
+            // ToastAndroid.show(FETCH_EDITION_FAIL, ToastAndroid.SHORT);
             return state;
         case EDITION_INFO_CLEAR:
-            ToastAndroid.show(EDITION_INFO_CLEAR, ToastAndroid.SHORT);
+            // ToastAndroid.show(EDITION_INFO_CLEAR, ToastAndroid.SHORT);
             return state.filter(({ id }) => id !== action.payload);
         case EDITION_ADD_LIKE:
-            ToastAndroid.show(EDITION_ADD_LIKE, ToastAndroid.SHORT);
+            // ToastAndroid.show(EDITION_ADD_LIKE, ToastAndroid.SHORT);
             return state.map((album, index) => {
                 if (album.id === action.payload) {
                     // Return a new object
@@ -60,7 +60,7 @@ export function edition (state = [], action) {
                 return album;
             })
         case EDITION_DELETE_LIKE:
-            ToastAndroid.show(EDITION_DELETE_LIKE, ToastAndroid.SHORT);
+            // ToastAndroid.show(EDITION_DELETE_LIKE, ToastAndroid.SHORT);
             return state.map((album, index) => {
                 if (album.id === action.payload) {
                     // Return a new object
@@ -73,7 +73,7 @@ export function edition (state = [], action) {
                 return album;
             })
         case TRACK_ADD_LIKE:
-            ToastAndroid.show(TRACK_ADD_LIKE, ToastAndroid.SHORT);
+            // ToastAndroid.show(TRACK_ADD_LIKE, ToastAndroid.SHORT);
             return state.map((album, index) => {
                 return {
                     ...album,
@@ -91,7 +91,7 @@ export function edition (state = [], action) {
                 }
             })
         case TRACK_DELETE_LIKE:
-            ToastAndroid.show(TRACK_DELETE_LIKE, ToastAndroid.SHORT);
+            // ToastAndroid.show(TRACK_DELETE_LIKE, ToastAndroid.SHORT);
             return state.map((album, index) => {
                 return {
                     ...album,
@@ -109,7 +109,7 @@ export function edition (state = [], action) {
                 }
             })
         case TRACK_INCREMENT_LISTENING:
-            ToastAndroid.show(TRACK_INCREMENT_LISTENING, ToastAndroid.SHORT);
+            // ToastAndroid.show(TRACK_INCREMENT_LISTENING, ToastAndroid.SHORT);
             return state.map((album, index) => {
                 return {
                     ...album,

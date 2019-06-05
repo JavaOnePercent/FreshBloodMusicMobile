@@ -9,10 +9,10 @@ export function chartPerformers (state = [], action) {
     switch(action.type)
     {
         case FETCH_PERFORMERS_SUCCESS:
-            ToastAndroid.show(FETCH_PERFORMERS_SUCCESS, ToastAndroid.SHORT);
+            // ToastAndroid.show(FETCH_PERFORMERS_SUCCESS, ToastAndroid.SHORT);
             return action.payload;
         case FETCH_PERFORMERS_FAIL:
-            ToastAndroid.show(FETCH_PERFORMERS_FAIL, ToastAndroid.SHORT);
+            // ToastAndroid.show(FETCH_PERFORMERS_FAIL, ToastAndroid.SHORT);
             return state;
         default:
             return state;

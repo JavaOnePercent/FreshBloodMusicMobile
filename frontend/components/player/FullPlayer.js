@@ -9,7 +9,7 @@ import SortableList from 'react-native-sortable-list';
 import Swiper from "react-native-swiper";
 import store from "../../redux/store";
 
-import Track from '../Track';
+import Queue from '../Queue';
 import {createPrevious, createQueue, releasePlayer} from "../../redux/actions/player";
 
 
@@ -46,8 +46,8 @@ class FullPlayer extends Component {
         sound: PropTypes.object.isRequired,
         closePlayer: PropTypes.func.isRequired,
         isPlay: PropTypes.string.isRequired,
-        isRandom: PropTypes.bool.isRequired,
-        random: PropTypes.func.isRequired,
+        modePlay: PropTypes.string.isRequired,
+        playMode: PropTypes.func.isRequired,
         repeatStatus: PropTypes.string.isRequired,
         repeat: PropTypes.func.isRequired,
         isLiked: PropTypes.bool.isRequired,
@@ -188,7 +188,7 @@ class FullPlayer extends Component {
 
     onRandomButton()
     {
-        this.props.random()
+        this.props.playMode()
     }
 
     onRepeatButton()
@@ -207,38 +207,8 @@ class FullPlayer extends Component {
     }
 
     _renderRow = ({data}) => {
-        return <Track data={data}  />
+        return <Queue data={data}  />
     }
-
-    // _renderRow = ({data, active}) => {
-    //     return (
-    //         <View style={styles.listItem}>
-    //             <View style={styles.rowStyle}>
-    //                 <View style={styles.iconAlbum}>
-    //                     <Image
-    //                         source={{uri: data.image}}
-    //                         style={{width: 50, height: 50, borderRadius: 3}}
-    //                     />
-    //                 </View>
-    //             </View>
-    //             <View style={styles.rowStyle}>
-    //                 <View style={{flexDirection: 'column', width: Dimensions.get('window').width - 150, marginLeft: 10, marginTop: 5}}>
-    //                     <Text style={styles.titleTrack}>{data.nameTrack}</Text>
-    //                     <Text style={styles.titlePerformer}>{data.namePerformer}</Text>
-    //                 </View>
-    //             </View>
-    //             <View style={styles.rowStyle}>
-    //                 <TouchableHighlight style={styles.button} onPress={() => {ToastAndroid.show('Success', ToastAndroid.SHORT)}} underlayColor="#fff" >
-    //                     <Icon name="md-more"
-    //                           type="ionicon"
-    //                           size={28}
-    //                           color={'#000'}
-    //                     />
-    //                 </TouchableHighlight>
-    //             </View>
-    //         </View>
-    //     )
-    // }
 
     render() {
 
@@ -288,17 +258,28 @@ class FullPlayer extends Component {
                                     <Text style={{color:'#8d8e93', marginLeft: Dimensions.get('window').width / 2 - 83}}>-{durationString}</Text>
                                 </View>
                                 {
-                                    nameTrack &&
-                                    <Text style={styles.nameTrack}>{nameTrack}</Text>
+                                    nameTrack && namePerformer &&
+                                        <View style={styles.aboutTrack}>
+                                            <Text style={styles.nameTrack}>{nameTrack}</Text>
+                                            <Text style={styles.namePerformer}>{namePerformer}</Text>
+                                        </View>
                                 }
                                 {
-                                    !nameTrack &&
-                                    <Text style={styles.nameTrack}>{'Не исполняется'}</Text>
+                                    !nameTrack && !namePerformer &&
+                                    <View style={styles.aboutTrack}>
+                                        <Text style={styles.nameTrack}>{'Не исполняется'}</Text>
+                                        <Text style={styles.namePerformer}>{'Нет исполнителя'}</Text>
+                                    </View>
                                 }
-                                <Text style={styles.namePerformer}>{namePerformer}</Text>
                                 <View style={styles.buttonContainer}>
                                     <View style={styles.rowStyle}>
                                         <View style={styles.play}>
+                                            {isLiked === undefined &&
+                                            <TouchableHighlight style={styles.button} underlayColor="#fff">
+                                                <Icon name="ios-heart-empty" type="ionicon" size={28} color={'#000'}
+                                                />
+                                            </TouchableHighlight>
+                                            }
                                             {isLiked === false &&
                                             <TouchableHighlight style={styles.button} onPress={this.onLike} underlayColor="#fff">
                                                 <Icon name="ios-heart-empty" type="ionicon" size={28} color={'#000'}
@@ -364,13 +345,15 @@ class FullPlayer extends Component {
                                     </View>
                                     <View style={styles.rowStyle}>
                                         <View style={styles.play}>
-                                            <TouchableHighlight style={styles.button} onPress={this.onOpenPagePerformer} underlayColor="#fff">
-                                                <Icon name="microphone-variant"
-                                                      type="material-community"
-                                                      size={28}
-                                                      color={'#000'}
-                                                />
-                                            </TouchableHighlight>
+                                            {/*<TouchableHighlight style={styles.button} onPress={this.onOpenPagePerformer} underlayColor="#fff">*/}
+                                            {/*    <Icon name="microphone-variant"*/}
+                                            {/*          type="material-community"*/}
+                                            {/*          size={28}*/}
+                                            {/*          color={'#000'}*/}
+                                            {/*    />*/}
+                                            {/*</TouchableHighlight>*/}
+                                            <View style={styles.button}>
+                                            </View>
                                         </View>
                                     </View>
                                 </View>
@@ -416,7 +399,7 @@ class FullPlayer extends Component {
                             {translateX: 0},
                             {translateY: Dimensions.get('window').height - 75}]}}>
                         <View style={{flexDirection:'row'}}>
-                            {this.props.isRandom === false &&
+                            {this.props.modePlay === 'common' &&
                                 <View style={{marginRight: Dimensions.get('window').width - 250}}>
                                     <TouchableHighlight style={styles.button} underlayColor="#fff"
                                                         onPress={this.onRandomButton}>
@@ -428,7 +411,7 @@ class FullPlayer extends Component {
                                     </TouchableHighlight>
                                 </View>
                             }
-                            {this.props.isRandom === true &&
+                            {this.props.modePlay === 'random' &&
                                 <View style={{marginRight: Dimensions.get('window').width - 250}}>
                                     <TouchableHighlight style={styles.button} underlayColor="#fff"
                                                         onPress={this.onRandomButton}>
@@ -440,7 +423,7 @@ class FullPlayer extends Component {
                                     </TouchableHighlight>
                                 </View>
                             }
-                            {this.props.repeatStatus === 'unrepeat' &&
+                            {this.props.modePlay !== 'radio' && this.props.repeatStatus === 'unrepeat' &&
                                 <View style={{marginLeft: Dimensions.get('window').width - 250}}>
                                     <TouchableHighlight style={styles.button} underlayColor="#fff"
                                                         onPress={this.onRepeatButton}>
@@ -452,7 +435,7 @@ class FullPlayer extends Component {
                                     </TouchableHighlight>
                                 </View>
                             }
-                            {this.props.repeatStatus === 'repeat' &&
+                            {this.props.modePlay !== 'radio' && this.props.repeatStatus === 'repeat' &&
                                 <View style={{marginLeft: Dimensions.get('window').width - 250}}>
                                     <TouchableHighlight style={styles.button} underlayColor="#fff"
                                                         onPress={this.onRepeatButton}>
@@ -464,7 +447,7 @@ class FullPlayer extends Component {
                                     </TouchableHighlight>
                                 </View>
                             }
-                            {this.props.repeatStatus === 'repeat-one' &&
+                            {this.props.modePlay !== 'radio' && this.props.repeatStatus === 'repeat-one' &&
                                 <View style={{marginLeft: Dimensions.get('window').width - 250}}>
                                     <TouchableHighlight style={styles.button} underlayColor="#fff"
                                                         onPress={this.onRepeatButton}>
@@ -525,11 +508,13 @@ const styles = StyleSheet.create({
     },
     namePerformer: {
         color: '#8d6fb9',
-        fontSize: 16
+        fontSize: 16,
     },
     nameTrack: {
         color: '#000',
-        fontSize: 24,
+        fontSize: 24
+    },
+    aboutTrack: {
         alignItems: 'center'
     },
     queue: {

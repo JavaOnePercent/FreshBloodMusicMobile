@@ -10,7 +10,7 @@ import {getLogin} from "../../../redux/actions/auth";
 import {createCurrentProfile, getAlbumsPerformer, getPerformer} from "../../../redux/actions/performer";
 import {getPerformers} from "../../../redux/actions/charts";
 import { createQueueTrend } from "../../../redux/actions/player";
-import { getNextTrack } from "../../../redux/actions/radio";
+import { getAllNextTrack } from "../../../redux/actions/radio";
 
 class News extends Component {
     constructor(props) {
@@ -30,10 +30,6 @@ class News extends Component {
         headerTintColor:'white',
         headerBackTitle: null,
         title: 'Новости'
-    };
-
-    updateSearch = search => {
-        this.setState({ search });
     };
 
     performer(id)
@@ -103,7 +99,7 @@ class News extends Component {
         this.props.onGetNews('new')
         this.props.onGetPerformers()
         this.props.onCreateQueueTrend()
-        this.props.onGetNextTrack()
+        this.props.onGetAllNextTrack()
     }
 
     componentWillUnmount(){
@@ -201,8 +197,8 @@ export default connect(
         onCreateQueueTrend: () => {
             dispatch(createQueueTrend());
         },
-        onGetNextTrack: () => {
-            dispatch(getNextTrack());
+        onGetAllNextTrack: () => {
+            dispatch(getAllNextTrack());
         }
     })
 )(News)

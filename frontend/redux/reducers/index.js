@@ -1,17 +1,22 @@
 import { combineReducers } from 'redux';
 
 import { auth } from './authReducer';
-import { player, listen, random, repeat, previous, current, queue, playlist } from './playerReducer';
+import { player, listen, modePlay, repeat, previous, current, queue, playlist } from './playerReducer';
 import { news, edition } from './newsReducer';
 import { currentProfile, performer, albums } from './performerReducer';
 import { chartPerformers } from './chartsReducer';
-import { radioNext } from './radioReducer';
+import { radioNext, radioCurrent } from './radioReducer';
+import { userPlaylists } from './userReducer';
+import { customPlaylist, listPlaylist, addedPlaylist } from './playlistReducer';
+import { likedAlbums } from './albumsReducer';
+import { likedTracks } from './tracksReducer';
+import { search } from './searchReducer';
 
 export default combineReducers({
     auth,
     player,
     listen,
-    random,
+    modePlay,
     repeat,
     previous,
     current,
@@ -23,5 +28,13 @@ export default combineReducers({
     performer,
     albums,
     chartPerformers,
-    radioNext
+    radioNext,
+    radioCurrent,
+    userPlaylists,
+    customPlaylist,
+    likedAlbums,
+    likedTracks,
+    listPlaylist,
+    addedPlaylist,
+    search
 });

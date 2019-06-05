@@ -13,12 +13,12 @@ import {
     Dimensions
 } from 'react-native';
 import { Provider, connect } from 'react-redux';
-import store from "../../redux/store";
-import Album from "../../components/Album";
-import Playlist from "../../components/Playlist";
+import store from "../../../redux/store";
+import Album from "../../../components/Album";
+import Playlist from "../../../components/Playlist";
 
-import { getEdition, clearEdition} from "../../redux/actions/news";
-import {getAlbumsPerformer, getPerformer} from "../../redux/actions/performer";
+import { getEdition, clearEdition} from "../../../redux/actions/news";
+import {getAlbumsPerformer, getPerformer} from "../../../redux/actions/performer";
 
 class Profile extends Component {
     constructor(props) {

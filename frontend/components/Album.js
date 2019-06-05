@@ -16,6 +16,7 @@ class Album extends Component {
         title: PropTypes.string.isRequired,
         performer: PropTypes.string.isRequired,
         showTracks: PropTypes.func.isRequired,
+        deletePlaylist: PropTypes.func.isRequired,
         iconAlbum: PropTypes.string.isRequired
     }
 
@@ -26,10 +27,10 @@ class Album extends Component {
     }
 
     render() {
-        const { title, performer, showTracks, iconAlbum, width, height } = this.props;
+        const { title, performer, showTracks, iconAlbum, width, height, deletePlaylist } = this.props;
         return (
             <View style={styles.container}>
-                <TouchableHighlight onPress={showTracks} underlayColor="#fff">
+                <TouchableHighlight onPress={showTracks} onLongPress={deletePlaylist} underlayColor="#fff">
                     <Image
                         source={ {uri: iconAlbum} }
                         style={{ width: width, height: height, borderRadius: 5 }}

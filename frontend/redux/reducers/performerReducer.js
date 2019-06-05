@@ -13,10 +13,10 @@ export function currentProfile (state = -1, action) {
     switch(action.type)
     {
         case FETCH_PROFILE_SUCCESS:
-            ToastAndroid.show(FETCH_PROFILE_SUCCESS, ToastAndroid.SHORT);
+            // ToastAndroid.show(FETCH_PROFILE_SUCCESS, ToastAndroid.SHORT);
             return action.payload;
         case FETCH_PROFILE_FAIL:
-            ToastAndroid.show(FETCH_PROFILE_FAIL, ToastAndroid.SHORT);
+            // ToastAndroid.show(FETCH_PROFILE_FAIL, ToastAndroid.SHORT);
             return state;
         default:
             return state;
@@ -27,10 +27,10 @@ export function performer (state = {}, action) {
     switch(action.type)
     {
         case FETCH_PERFORMER_SUCCESS:
-            ToastAndroid.show(FETCH_PERFORMER_SUCCESS, ToastAndroid.SHORT);
+            // ToastAndroid.show(FETCH_PERFORMER_SUCCESS, ToastAndroid.SHORT);
             return action.payload;
         case FETCH_PERFORMER_FAIL:
-            ToastAndroid.show(FETCH_PERFORMER_FAIL, ToastAndroid.SHORT);
+            // ToastAndroid.show(FETCH_PERFORMER_FAIL, ToastAndroid.SHORT);
             return state;
         default:
             return state;
@@ -41,10 +41,10 @@ export function albums (state = [], action) {
     switch(action.type)
     {
         case FETCH_ALBUMS_SUCCESS:
-            ToastAndroid.show(FETCH_ALBUMS_SUCCESS, ToastAndroid.SHORT);
+            // ToastAndroid.show(FETCH_ALBUMS_SUCCESS, ToastAndroid.SHORT);
             return action.payload;
         case FETCH_ALBUMS_FAIL:
-            ToastAndroid.show(FETCH_ALBUMS_FAIL, ToastAndroid.SHORT);
+            // ToastAndroid.show(FETCH_ALBUMS_FAIL, ToastAndroid.SHORT);
             return state;
         default:
             return state;

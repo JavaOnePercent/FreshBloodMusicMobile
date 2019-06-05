@@ -133,8 +133,8 @@ export const getTrends = (interval) => async dispatch => {
         let data = response.data;
         for(let i = 0; i < data.length; i++)
         {
-            data[i].image_alb = ADDRESS_SERVER + data[i].image_alb.substring(25)
-            data[i].audio_trc = ADDRESS_SERVER + data[i].audio_trc.substring(25)
+            data[i].image_alb = ADDRESS_SERVER + data[i].image_alb
+            data[i].audio_trc = ADDRESS_SERVER + data[i].audio_trc
         }
         let trends = {}
         if(interval === 3)

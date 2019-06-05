@@ -41,6 +41,7 @@ import {
 } from "../redux/actions/player";
 
 import { addLikeEdition, deleteLikeEdition, addLikeTrack, deleteLikeTrack } from "../redux/actions/news";
+import { getListPlaylist, getAddedListPlaylist, clearListPlaylist, clearAddedListPlaylist, addTrackAddedPlaylist } from "../redux/actions/playlist";
 
 class Playlist extends Component {
     constructor(props) {
@@ -58,7 +59,9 @@ class Playlist extends Component {
     }
 
     state = {
-        album: []
+        album: {},
+        listPlaylist: [],
+        addedPlaylist: []
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -69,10 +72,26 @@ class Playlist extends Component {
                 album: nextProps.album
             }
         }
+        if(prevState.listPlaylist !== nextProps.listPlaylist)
+        {
+            return {
+                listPlaylist: nextProps.listPlaylist
+            }
+        }
+        if(prevState.addedPlaylist !== nextProps.addedPlaylist)
+        {
+            return {
+                addedPlaylist: nextProps.addedPlaylist
+            }
+        }
     }
 
     onPressLong(i, l)
     {
+        this.props.onClearListPlaylist()
+        this.props.onClearAddedListPlaylist()
+        this.props.onGetListPlaylist(this.props.auth.id)
+        this.props.onGetAddedListPlaylist(this.props.auth.id, l.id)
         this.setState({
             idTrack: l.id,
             indexTrack: i
@@ -360,6 +379,11 @@ class Playlist extends Component {
                 this.props.onUnlikeTrackQueue(this.state.idTrack)
             }
         }
+    }
+
+    addTrackCustomPlaylist(idPlaylist, idTrack)
+    {
+        this.props.onAddTrackAddedPlaylist(idPlaylist, idTrack)
     }
 
     render() {
@@ -680,70 +704,94 @@ class Playlist extends Component {
                                     {
                                         this.state.idTrack !== 0 &&
                                         <View>
-                                            <TouchableHighlight onPress={() => {
-                                                ToastAndroid.show(edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].name_trc, ToastAndroid.SHORT)
-                                            }} underlayColor="#fff">
-                                                <View style={styles.listTrack}>
-                                                    <View style={styles.rowPlaylistStyle}>
-                                                        <Text style={styles.textName}>Разное</Text>
+                                            {
+                                                this.props.listPlaylist.map((l, i) => (
+                                                    <View>
+                                                        {
+                                                            this.props.addedPlaylist.includes(l.id) &&
+                                                                <View style={styles.listTrack}>
+                                                                    <View style={styles.rowPlaylistStyle}>
+                                                                        <Text style={styles.textName}>{l.title}</Text>
+                                                                    </View>
+                                                                    <View style={styles.rowIconOrNumberStyle}>
+                                                                        <Icon name="ios-checkmark"
+                                                                              type="ionicon"
+                                                                              size={36}
+                                                                              color={'#000'}
+                                                                        />
+                                                                    </View>
+                                                                </View>
+                                                        }
+                                                        {
+                                                            !this.props.addedPlaylist.includes(l.id) &&
+                                                            <TouchableHighlight
+                                                                onPress={this.addTrackCustomPlaylist.bind(this, l.id, this.state.idTrack)}
+                                                                underlayColor="#fff">
+                                                                <View style={styles.listTrack}>
+                                                                    <View style={styles.rowPlaylistStyle}>
+                                                                        <Text style={styles.textName}>{l.title}</Text>
+                                                                    </View>
+                                                                    <View style={styles.rowIconOrNumberStyle}>
+                                                                        <Icon name="ios-add"
+                                                                              type="ionicon"
+                                                                              size={30}
+                                                                              color={'#000'}
+                                                                        />
+                                                                    </View>
+                                                                </View>
+                                                            </TouchableHighlight>
+                                                        }
                                                     </View>
-                                                    <View style={styles.rowIconOrNumberStyle}>
-                                                        <Icon name="ios-add"
-                                                              type="ionicon"
-                                                              size={30}
-                                                              color={'#000'}
-                                                        />
-                                                    </View>
-                                                </View>
-                                            </TouchableHighlight>
-                                            <TouchableHighlight onPress={() => {
-                                                ToastAndroid.show(edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].name_trc, ToastAndroid.SHORT)
-                                            }} underlayColor="#fff">
-                                                <View style={styles.listTrack}>
-                                                    <View style={styles.rowPlaylistStyle}>
-                                                        <Text style={styles.textName}>Плейлист Я - Вова</Text>
-                                                    </View>
-                                                    <View style={styles.rowIconOrNumberStyle}>
-                                                        <Icon name="ios-checkmark"
-                                                              type="ionicon"
-                                                              size={36}
-                                                              color={'#000'}
-                                                        />
-                                                    </View>
-                                                </View>
-                                            </TouchableHighlight>
-                                            <TouchableHighlight onPress={() => {
-                                                ToastAndroid.show(edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].name_trc, ToastAndroid.SHORT)
-                                            }} underlayColor="#fff">
-                                                <View style={styles.listTrack}>
-                                                    <View style={styles.rowPlaylistStyle}>
-                                                        <Text style={styles.textName}>Очень плохая музыка</Text>
-                                                    </View>
-                                                    <View style={styles.rowIconOrNumberStyle}>
-                                                        <Icon name="ios-add"
-                                                              type="ionicon"
-                                                              size={30}
-                                                              color={'#000'}
-                                                        />
-                                                    </View>
-                                                </View>
-                                            </TouchableHighlight>
-                                            <TouchableHighlight onPress={() => {
-                                                ToastAndroid.show(edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].name_trc, ToastAndroid.SHORT)
-                                            }} underlayColor="#fff">
-                                                <View style={styles.listTrack}>
-                                                    <View style={styles.rowPlaylistStyle}>
-                                                        <Text style={styles.textName}>Плейлист Илюхи</Text>
-                                                    </View>
-                                                    <View style={styles.rowIconOrNumberStyle}>
-                                                        <Icon name="ios-add"
-                                                              type="ionicon"
-                                                              size={30}
-                                                              color={'#000'}
-                                                        />
-                                                    </View>
-                                                </View>
-                                            </TouchableHighlight>
+                                                            ))
+                                                        }
+                                            {/*<TouchableHighlight onPress={() => {*/}
+                                            {/*    ToastAndroid.show(edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].name_trc, ToastAndroid.SHORT)*/}
+                                            {/*}} underlayColor="#fff">*/}
+                                            {/*    <View style={styles.listTrack}>*/}
+                                            {/*        <View style={styles.rowPlaylistStyle}>*/}
+                                            {/*            <Text style={styles.textName}>Плейлист Я - Вова</Text>*/}
+                                            {/*        </View>*/}
+                                            {/*        <View style={styles.rowIconOrNumberStyle}>*/}
+                                            {/*            <Icon name="ios-checkmark"*/}
+                                            {/*                  type="ionicon"*/}
+                                            {/*                  size={36}*/}
+                                            {/*                  color={'#000'}*/}
+                                            {/*            />*/}
+                                            {/*        </View>*/}
+                                            {/*    </View>*/}
+                                            {/*</TouchableHighlight>*/}
+                                            {/*<TouchableHighlight onPress={() => {*/}
+                                            {/*    ToastAndroid.show(edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].name_trc, ToastAndroid.SHORT)*/}
+                                            {/*}} underlayColor="#fff">*/}
+                                            {/*    <View style={styles.listTrack}>*/}
+                                            {/*        <View style={styles.rowPlaylistStyle}>*/}
+                                            {/*            <Text style={styles.textName}>Очень плохая музыка</Text>*/}
+                                            {/*        </View>*/}
+                                            {/*        <View style={styles.rowIconOrNumberStyle}>*/}
+                                            {/*            <Icon name="ios-add"*/}
+                                            {/*                  type="ionicon"*/}
+                                            {/*                  size={30}*/}
+                                            {/*                  color={'#000'}*/}
+                                            {/*            />*/}
+                                            {/*        </View>*/}
+                                            {/*    </View>*/}
+                                            {/*</TouchableHighlight>*/}
+                                            {/*<TouchableHighlight onPress={() => {*/}
+                                            {/*    ToastAndroid.show(edition.tracks.filter(({ id }) => id === this.state.idTrack)[0].name_trc, ToastAndroid.SHORT)*/}
+                                            {/*}} underlayColor="#fff">*/}
+                                            {/*    <View style={styles.listTrack}>*/}
+                                            {/*        <View style={styles.rowPlaylistStyle}>*/}
+                                            {/*            <Text style={styles.textName}>Плейлист Илюхи</Text>*/}
+                                            {/*        </View>*/}
+                                            {/*        <View style={styles.rowIconOrNumberStyle}>*/}
+                                            {/*            <Icon name="ios-add"*/}
+                                            {/*                  type="ionicon"*/}
+                                            {/*                  size={30}*/}
+                                            {/*                  color={'#000'}*/}
+                                            {/*            />*/}
+                                            {/*        </View>*/}
+                                            {/*    </View>*/}
+                                            {/*</TouchableHighlight>*/}
                                         </View>
                                     }
                                 </ScrollView>
@@ -893,8 +941,9 @@ const styles = StyleSheet.create({
 });
 
 export default connect(
-    state => ({isPlay: state.player, listen: state.listen, current: state.current, random: state.random, auth: state.auth,
-        playlist: state.playlist, previous: state.previous, queue: state.queue}),
+    state => ({isPlay: state.player, listen: state.listen, current: state.current, auth: state.auth,
+        playlist: state.playlist, previous: state.previous, queue: state.queue, listPlaylist: state.listPlaylist,
+        addedPlaylist: state.addedPlaylist}),
     dispatch => ({
         onPressPlayButton: () => {
             dispatch(playPlayer());
@@ -976,6 +1025,21 @@ export default connect(
         },
         onDeleteLikeTrack: (id) => {
             dispatch(deleteLikeTrack(id));
+        },
+        onGetListPlaylist: (id) => {
+            dispatch(getListPlaylist(id));
+        },
+        onGetAddedListPlaylist: (idPerformer, idTrack) => {
+            dispatch(getAddedListPlaylist(idPerformer, idTrack));
+        },
+        onClearListPlaylist: () => {
+            dispatch(clearListPlaylist());
+        },
+        onClearAddedListPlaylist: () => {
+            dispatch(clearAddedListPlaylist());
+        },
+        onAddTrackAddedPlaylist: (idPlaylist, idTrack) => {
+            dispatch(addTrackAddedPlaylist(idPlaylist, idTrack));
         }
     })
 )(Playlist)

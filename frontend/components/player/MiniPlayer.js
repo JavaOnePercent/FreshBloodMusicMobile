@@ -64,7 +64,7 @@ class MiniPlayer extends Component {
                                         {
                                             !nameTrack &&
                                             <Image
-                                                source={require('../../icons/default-cover.png')}
+                                                source={require('../../icons/default-cover-mini.png')}
                                                 style={{width: 50, height: 50}}
                                             />
 

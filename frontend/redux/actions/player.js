@@ -6,6 +6,7 @@ import {
     PLAYER_UNLISTEN_MUSIC,
     PLAYER_COMMON_MUSIC,
     PLAYER_RANDOM_MUSIC,
+    PLAYER_RADIO_MUSIC,
     PLAYER_UNREPEAT_MUSIC,
     PLAYER_REPEAT_MUSIC,
     PLAYER_REPEAT_ONE_MUSIC,
@@ -66,6 +67,10 @@ export const createCommonMusic = () => dispatch => {
 
 export const createRandomMusic = () => dispatch => {
     dispatch({type: PLAYER_RANDOM_MUSIC});
+};
+
+export const createRadioMusic = () => dispatch => {
+    dispatch({type: PLAYER_RADIO_MUSIC});
 };
 
 export const unrepeatMusic = () => dispatch => {
@@ -130,15 +135,15 @@ export const createQueueTrend = () => async dispatch => {
         params: {
             filter: 'popular',
             limit: 20,
-            interval: 7
+            interval: 3
         }
     }).then(function (response) {
         let data = response.data;
         let queue = []
         for(let i = 0; i < data.length; i++)
         {
-            data[i].image_alb = ADDRESS_SERVER + data[i].image_alb.substring(25)
-            data[i].audio_trc = ADDRESS_SERVER + data[i].audio_trc.substring(25)
+            data[i].image_alb = ADDRESS_SERVER + data[i].image_alb
+            data[i].audio_trc = ADDRESS_SERVER + data[i].audio_trc
 
             queue.push({id: data[i].id, idPerformer: data[i].id_per, performer: data[i].name_per, cover: data[i].image_alb,
                 title: data[i].name_trc, audio: data[i].audio_trc, duration: data[i].duration,

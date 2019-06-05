@@ -1,9 +1,11 @@
-import {Dimensions, StyleSheet, Text, ToastAndroid, TouchableHighlight, View} from "react-native";
+import {Alert, Dimensions, StyleSheet, Text, ToastAndroid, TouchableHighlight, View} from "react-native";
 import {Icon, Image} from "react-native-elements";
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
-import { removeTrackQueue, removeTrackPlaylist } from "../redux/actions/player";
+import {removeTrackQueue, removeTrackPlaylist} from "../redux/actions/player";
 import {connect} from "react-redux";
+import {deleteTrackFromPlaylist, likeTrackFromPlaylist, unlikeTrackFromPlaylist} from "../redux/actions/playlist";
+import { deleteLikeTrack } from "../redux/actions/tracks";
 
 class Track extends Component {
 
@@ -12,24 +14,64 @@ class Track extends Component {
     }
 
     static propTypes = {
-        data: PropTypes.object.isRequired
+        id: PropTypes.number.isRequired,
+        idTrack: PropTypes.number.isRequired,
+        cover: PropTypes.string.isRequired,
+        audio: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired,
+        isLiked: PropTypes.bool.isRequired,
+        idPlaylist: PropTypes.number.isRequired,
+        performer: PropTypes.string.isRequired,
+        play: PropTypes.func.isRequired,
+        isLikedPlaylist: PropTypes.bool.isRequired
     }
 
-    deleteTrack(id)
+    deleteTrack()
     {
-        this.props.onRemoveTrackQueue(id)
-        this.props.onRemoveTrackPlaylist(id)
+        return (
+            Alert.alert('Подтвержение', 'Вы действительно хотите удалить композицию ' + this.props.title + ' из текущего плейлиста?', [
+                    {
+                        text: 'Да',
+                        onPress: () => this.props.onDeleteTrackFromPlaylist(this.props.idPlaylist, this.props.id, this.props.idTrack)
+                    },
+                    {text: 'Нет', style: 'cancel'},
+                ], {cancelable: false}
+            )
+        )
     }
 
-    render() {
-        const {data} = this.props;
+    likeTrack()
+    {
+        this.props.onLikeTrackFromPlaylist(this.props.id, this.props.idTrack)
+    }
 
+    unlikeTrack()
+    {
+        this.props.onUnlikeTrackFromPlaylist(this.props.id, this.props.idTrack)
+    }
+
+    unlikeLikedTrack()
+    {
         return (
+            Alert.alert('Подтвержение', 'Вы действительно хотите удалить композицию ' + this.props.title + ' из понравившихся композиций?', [
+                    {
+                        text: 'Да',
+                        onPress: () => this.props.onDeleteLikeTrack(this.props.idTrack)
+                    },
+                    {text: 'Нет', style: 'cancel'},
+                ], {cancelable: false}
+            )
+        )
+    }
+    render() {
+        const {id, play, cover, audio, title, isLiked, idPlaylist, performer, isLikedPlaylist} = this.props
+        return (
+            <TouchableHighlight onPress={play} underlayColor="#fff">
             <View style={styles.listItem}>
                 <View style={styles.rowStyle}>
                     <View style={styles.iconAlbum}>
                         <Image
-                            source={{uri: data.cover}}
+                            source={{uri: cover}}
                             style={{width: 50, height: 50, borderRadius: 3}}
                         />
                     </View>
@@ -37,24 +79,63 @@ class Track extends Component {
                 <View style={styles.rowStyle}>
                     <View style={{
                         flexDirection: 'column',
-                        width: Dimensions.get('window').width - 150,
+                        width: Dimensions.get('window').width - 200,
                         marginLeft: 10,
                         marginTop: 12
                     }}>
-                        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.titleTrack}>{data.title}</Text>
-                        <Text style={styles.titlePerformer}>{data.performer}</Text>
+                        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.titleTrack}>{title}</Text>
+                        <Text style={styles.titlePerformer}>{performer}</Text>
                     </View>
-                </View>
-                <View style={styles.rowStyle}>
-                    <TouchableHighlight style={styles.button} onPress={() => this.deleteTrack(data.id)} underlayColor="#fff">
-                        <Icon name="md-remove-circle"
-                              type="ionicon"
-                              size={28}
-                              color={'#000'}
-                        />
-                    </TouchableHighlight>
+                    {
+                        isLikedPlaylist === false && isLiked === true &&
+                        <View style={styles.rowStyle}>
+                            <TouchableHighlight style={styles.button} onPress={() => this.unlikeTrack()} underlayColor="#fff">
+                                <Icon name="ios-heart"
+                                      type="ionicon"
+                                      size={28}
+                                      color={'#8d6fb9'}
+                                />
+                            </TouchableHighlight>
+                        </View>
+                    }
+                    {
+                        isLikedPlaylist === false && isLiked === false &&
+                        <View style={styles.rowStyle}>
+                            <TouchableHighlight style={styles.button} onPress={() => this.likeTrack()} underlayColor="#fff">
+                                <Icon name="ios-heart-empty"
+                                      type="ionicon"
+                                      size={28}
+                                      color={'#000'}
+                                />
+                            </TouchableHighlight>
+                        </View>
+                    }
+                    {   isLikedPlaylist === false &&
+                        <View style={styles.rowStyle}>
+                            <TouchableHighlight style={styles.button} onPress={() => this.deleteTrack()} underlayColor="#fff">
+                                <Icon name="md-trash"
+                                      type="ionicon"
+                                      size={28}
+                                      color={'#000'}
+                                />
+                            </TouchableHighlight>
+                        </View>
+                    }
+                    {
+                        isLikedPlaylist === true &&
+                        <View style={styles.rowStyle}>
+                            <TouchableHighlight style={styles.buttonLikedTrack} onPress={() => this.unlikeLikedTrack(id)} underlayColor="#fff">
+                                <Icon name="ios-heart"
+                                      type="ionicon"
+                                      size={28}
+                                      color={'#8d6fb9'}
+                                />
+                            </TouchableHighlight>
+                        </View>
+                    }
                 </View>
             </View>
+            </TouchableHighlight>
         );
     }
 }
@@ -86,9 +167,15 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 25,
-        alignItems: 'center',
-        justifyContent: 'center'
+        marginTop: 15
     },
+    buttonLikedTrack: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        marginTop: 15,
+        marginLeft: 50
+    }
 });
 
 export default connect(
@@ -99,6 +186,18 @@ export default connect(
         },
         onRemoveTrackPlaylist: (id) => {
             dispatch(removeTrackPlaylist(id));
-        }
+        },
+        onDeleteTrackFromPlaylist: (idPlaylist, id, idTrack) => {
+            dispatch(deleteTrackFromPlaylist(idPlaylist, id, idTrack));
+        },
+        onLikeTrackFromPlaylist: (id, idTrack) => {
+            dispatch(likeTrackFromPlaylist(id, idTrack));
+        },
+        onUnlikeTrackFromPlaylist: (id, idTrack) => {
+            dispatch(unlikeTrackFromPlaylist(id, idTrack));
+        },
+        onDeleteLikeTrack: (id) => {
+            dispatch(deleteLikeTrack(id));
+        },
     })
 )(Track)

@@ -13,8 +13,7 @@ class EntryButton extends Component {
     static propTypes = {
         nameUser: PropTypes.string.isRequired,
         iconUser: PropTypes.string.isRequired,
-        action: PropTypes.func.isRequired,
-        longAction: PropTypes.func.isRequired
+        action: PropTypes.func.isRequired
     }
 
     componentDidMount()
@@ -24,17 +23,17 @@ class EntryButton extends Component {
 
     render() {
 
-        const { nameUser, iconUser, action, longAction } = this.props;
+        const { nameUser, iconUser, action } = this.props;
 
         return (
 
 
             <View style={styles.container}>
-                <TouchableHighlight onPress={action} onLongPress={longAction} underlayColor="#fff">
+                <TouchableHighlight onPress={action} style={{marginTop: 10, marginBottom: 30}} underlayColor="#fff">
                     <View style={styles.performerContainer}>
                         <View style={styles.rowStyle}>
                             {!nameUser &&
-                            <Icon name="user-circle-o"
+                            <Icon name="user-o"
                                   type="font-awesome"
                                   size={50}
                                   color={'#000'}
@@ -64,28 +63,24 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        marginBottom: 10,
-        paddingBottom: 25,
-        alignItems: 'center',
+        alignItems: 'center'
     },
     title: {
         fontSize: 30,
         color: 'gray'
     },
     performerContainer: {
-        paddingLeft: 15,
         flexDirection: 'row',
-        flexWrap: 'wrap',
+        flexWrap: 'wrap'
     },
     rowStyle: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        justifyContent: 'center',
+        flexWrap: 'wrap'
     },
     columnStyle: {
         flexDirection: 'column',
-        padding: 10,
+        paddingTop: 5,
+        paddingLeft: 10
     }
 });
 

@@ -16,16 +16,17 @@ import Charts from "../../views/mainapp/charts/Charts";
 
 import Favorites from "../../views/mainapp/favorites/Favorites";
 import Authorization from "../../views/mainapp/favorites/Authorization";
-import Liked from "../../views/mainapp/favorites/Liked";
-import Recommendations from "../../views/mainapp/favorites/Recommendations";
+import LikedTracks from "../../views/mainapp/favorites/LikedTracks";
+import LikedAlbums from "../../views/mainapp/favorites/LikedAlbums";
 import MyPlaylists from "../../views/mainapp/favorites/MyPlaylists";
-import Notifications from "../../views/mainapp/favorites/Notifications";
+import NewPlaylist from "../../views/mainapp/favorites/NewPlaylist";
+import Playlist from "../../views/mainapp/favorites/Playlist";
 
 import Search from "../../views/mainapp/search/Search";
 
 import Radio from "../../views/mainapp/radio/Radio";
 
-import Profile from "../../views/mainapp/Profile";
+import Profile from "../../views/mainapp/search/Profile";
 
 const TabNewsStack = createStackNavigator(
     {
@@ -43,10 +44,11 @@ const TabFavoritesStack = createStackNavigator(
     {
         Favorites: { screen: Favorites },
         Authorization: { screen: Authorization },
-        Liked: { screen: Liked },
-        Recommendations: { screen: Recommendations },
+        LikedTracks: { screen: LikedTracks },
+        LikedAlbums: { screen: LikedAlbums },
         MyPlaylists: { screen: MyPlaylists },
-        Notifications: { screen: Notifications },
+        NewPlaylist: { screen: NewPlaylist },
+        Playlist: { screen: Playlist },
 
     }
 );

@@ -7,7 +7,7 @@ import {connect, Provider} from "react-redux";
 import MiniPlayer from "../../components/player/MiniPlayer";
 import FullPlayer from "../../components/player/FullPlayer";
 
-import Profile from "../../views/mainapp/Profile";
+import Profile from "./search/Profile";
 
 import Sound from 'react-native-sound';
 import {
@@ -35,10 +35,11 @@ import {
     likeCurrent,
     unlikeCurrent,
     likeTrackPlaylist,
-    unlikeTrackPlaylist
+    unlikeTrackPlaylist, releasePlayer
 } from "../../redux/actions/player";
 import {createCurrentProfile, getAlbumsPerformer, getPerformer} from "../../redux/actions/performer";
 import {addLikeTrack, deleteLikeTrack, incrementListening} from "../../redux/actions/news";
+import {getNextTrack, getWithoutGenreNextTrack} from "../../redux/actions/radio";
 
 class AppMusic extends React.Component {
 
@@ -56,7 +57,7 @@ class AppMusic extends React.Component {
         this.stop = this.stop.bind(this)
         this.prev = this.prev.bind(this)
         this.next = this.next.bind(this)
-        this.random = this.random.bind(this)
+        this.playMode = this.playMode.bind(this)
         this.repeat = this.repeat.bind(this)
         this.likes = this.likes.bind(this)
         this.performer = this.performer.bind(this)
@@ -133,7 +134,7 @@ class AppMusic extends React.Component {
         {
             this.sound = new Sound(track.audio, Sound.MAIN_BUNDLE, (error) => {
                 if (error) {
-                    ToastAndroid.show('Error1', ToastAndroid.SHORT);
+                    // ToastAndroid.show('Error1', ToastAndroid.SHORT);
                 } else {
                     this.props.onListenPlayer()
                     this.sound.play((success) => {
@@ -141,7 +142,7 @@ class AppMusic extends React.Component {
                         {
                             this.props.onIncrementListening(this.props.current.id)
                             this.props.onUnlistenPlayer()
-                            if(this.props.repeat === 'unrepeat' || this.props.repeat === 'repeat')
+                            if((this.props.repeat === 'unrepeat' || this.props.repeat === 'repeat') && this.props.modePlay !== 'radio')
                             {
                                 if(this.props.queue.length > 0)
                                 {
@@ -184,6 +185,22 @@ class AppMusic extends React.Component {
                                     }
                                 }
                             }
+                            else if(this.props.queue.length === 0 && this.props.modePlay === 'radio')
+                            {
+                                this.sound.release();
+                                this.play(this.props.radioNext[this.props.radioCurrent]);
+                                this.props.onAddTrackPrevious(this.props.current);
+                                this.props.onAddCurrent(this.props.radioNext[this.props.radioCurrent])
+                                this.props.onPressPlayButton()
+                                if(this.props.radioCurrent === 0)
+                                {
+                                    this.props.onGetWithoutGenreNextTrack();
+                                }
+                                else
+                                {
+                                    this.props.onGetNextTrack(this.props.radioCurrent);
+                                }
+                            }
                             else
                             {
                                 this.sound.release();
@@ -193,7 +210,7 @@ class AppMusic extends React.Component {
                             }
                         }
                         else {
-                            ToastAndroid.show('Error2', ToastAndroid.SHORT);
+                            // ToastAndroid.show('Error2', ToastAndroid.SHORT);
                         }
                     });
                 }
@@ -206,7 +223,7 @@ class AppMusic extends React.Component {
                 if (success)
                 {
                     this.props.onIncrementListening(this.props.current.id)
-                    if(this.props.repeat === 'unrepeat' || this.props.repeat === 'repeat')
+                    if((this.props.repeat === 'unrepeat' || this.props.repeat === 'repeat') && this.props.modePlay !== 'radio')
                     {
                         if(this.props.queue.length > 0)
                         {
@@ -249,6 +266,22 @@ class AppMusic extends React.Component {
                             }
                         }
                     }
+                    else if(this.props.queue.length === 0 && this.props.modePlay === 'radio')
+                    {
+                        this.sound.release();
+                        this.play(this.props.radioNext[this.props.radioCurrent]);
+                        this.props.onAddTrackPrevious(this.props.current);
+                        this.props.onAddCurrent(this.props.radioNext[this.props.radioCurrent])
+                        this.props.onPressPlayButton()
+                        if(this.props.radioCurrent === 0)
+                        {
+                            this.props.onGetWithoutGenreNextTrack();
+                        }
+                        else
+                        {
+                            this.props.onGetNextTrack(this.props.radioCurrent);
+                        }
+                    }
                     else
                     {
                         this.sound.release();
@@ -259,7 +292,7 @@ class AppMusic extends React.Component {
                 }
                 else
                 {
-                    ToastAndroid.show('Error3', ToastAndroid.SHORT);
+                    // ToastAndroid.show('Error3', ToastAndroid.SHORT);
                 }
             });
         }
@@ -272,9 +305,9 @@ class AppMusic extends React.Component {
 
     prev()
     {
-        this.props.onUnlistenPlayer()
         if(this.props.previous.length > 0)
         {
+            this.props.onUnlistenPlayer()
             this.sound.release();
             this.play(this.props.previous[this.props.previous.length - 1]);
             this.props.onAddBeginQueue(this.props.current)
@@ -290,6 +323,7 @@ class AppMusic extends React.Component {
         {
             if(this.props.repeat === 'repeat')
             {
+                this.props.onUnlistenPlayer()
                 this.sound.release();
                 this.play(this.props.queue[this.props.queue.length - 1]);
                 this.props.onCreatePrevious(this.props.queue.slice(0, this.props.queue.length - 1))
@@ -303,15 +337,35 @@ class AppMusic extends React.Component {
 
     next()
     {
-        this.props.onUnlistenPlayer()
         if(this.props.queue.length > 0)
         {
-            this.sound.release();
+            this.props.onUnlistenPlayer()
+            if(this.sound !== undefined)
+            {
+                this.sound.release();
+            }
             this.play(this.props.queue[0]);
             this.props.onAddTrackPrevious(this.props.current)
             this.props.onAddCurrent(this.props.queue[0])
             this.props.onDeleteTrackQueue()
             this.props.onPressPlayButton()
+        }
+        else if(this.props.queue.length === 0 && this.props.modePlay === 'radio')
+        {
+            this.props.onUnlistenPlayer()
+            this.sound.release();
+            this.play(this.props.radioNext[this.props.radioCurrent]);
+            this.props.onAddTrackPrevious(this.props.current);
+            this.props.onAddCurrent(this.props.radioNext[this.props.radioCurrent])
+            this.props.onPressPlayButton()
+            if(this.props.radioCurrent === 0)
+            {
+                this.props.onGetWithoutGenreNextTrack();
+            }
+            else
+            {
+                this.props.onGetNextTrack(this.props.radioCurrent);
+            }
         }
         else if(this.props.previous.length === 0 && this.props.queue.length === 0)
         {
@@ -321,6 +375,7 @@ class AppMusic extends React.Component {
         {
             if(this.props.repeat === 'repeat')
             {
+                this.props.onUnlistenPlayer()
                 this.sound.release();
                 this.play(this.props.previous[0]);
                 this.props.onCreateQueue(this.props.previous.slice(1))
@@ -332,9 +387,9 @@ class AppMusic extends React.Component {
         }
     }
 
-    random()
+    playMode()
     {
-        if(this.props.random === true)
+        if(this.props.modePlay === 'random')
         {
             this.props.onCreateCommonMusic();
             if(this.props.current.id !== undefined)
@@ -360,7 +415,7 @@ class AppMusic extends React.Component {
                 this.props.onCreateQueue(queue)
             }
         }
-        else if(this.props.random === false)
+        else if(this.props.modePlay === 'common')
         {
             this.props.onCreateRandomMusic();
             if (this.props.current.id !== undefined)
@@ -464,8 +519,8 @@ class AppMusic extends React.Component {
                                 nextTrack={this.next}
                                 sound={this.sound}
                                 isPlay={this.props.isPlay}
-                                isRandom={this.props.random}
-                                random={this.random}
+                                modePlay={this.props.modePlay}
+                                playMode={this.playMode}
                                 repeatStatus={this.props.repeat}
                                 repeat={this.repeat}
                                 isLiked={current.isLiked}
@@ -498,13 +553,17 @@ const styles = StyleSheet.create({
 
 export default connect(
     state => ({isPlay: state.player, listen: state.listen, previous: state.previous, current: state.current,
-        queue: state.queue, playlist: state.playlist, random: state.random, repeat: state.repeat, auth: state.auth}),
+        queue: state.queue, playlist: state.playlist, modePlay: state.modePlay, radioNext: state.radioNext,
+        radioCurrent: state.radioCurrent, repeat: state.repeat, auth: state.auth}),
     dispatch => ({
         onPressPlayButton: () => {
             dispatch(playPlayer());
         },
         onPressPauseButton: () => {
             dispatch(pausePlayer());
+        },
+        onPressReleasePlayButton: (audio) => {
+            dispatch(releasePlayer(audio));
         },
         onListenPlayer: () => {
             dispatch(listenPlayer());
@@ -590,6 +649,11 @@ export default connect(
         onUnlikeTrackPlaylist: (id) => {
             dispatch(unlikeTrackPlaylist(id));
         },
-
+        onGetWithoutGenreNextTrack: () => {
+            dispatch(getWithoutGenreNextTrack());
+        },
+        onGetNextTrack: (id) => {
+            dispatch(getNextTrack(id));
+        },
     })
 )(AppMusic)
